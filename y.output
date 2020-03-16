@@ -1,29 +1,29 @@
-Terminaux inutilisés dans la grammaire
+Terminals unused in grammar
 
-   tLONG
-   tSIGNED
-   tUNSIGNED
-   tSHORT
-   tCONST
-   tIF
-   tELSE
-   tWHILE
-   tSWITCH
-   tFOR
-   tDO
-   tBREAK
-   tCONTINUE
-   tDEFAULT
-   tNEWLINE
-   tSPACE
-   tOB
-   tCB
-   tE_MARK
-   tI_MARK
-   tCOLON
+    tLONG
+    tSIGNED
+    tUNSIGNED
+    tSHORT
+    tCONST
+    tIF
+    tELSE
+    tWHILE
+    tSWITCH
+    tFOR
+    tDO
+    tBREAK
+    tCONTINUE
+    tDEFAULT
+    tNEWLINE
+    tSPACE
+    tOB
+    tCB
+    tE_MARK
+    tI_MARK
+    tCOLON
 
 
-Grammaire
+Grammar
 
     0 $accept: S $end
 
@@ -73,291 +73,302 @@ Grammaire
    33            | TYPE tIDENTIFIER
 
 
-Terminaux, suivis des règles où ils apparaissent
+Terminals, with rules where they appear
 
-$end (0) 0
-error (256)
-tMAIN (258) 1
-tPRINTF (259) 23
-tIDENTIFIER (260) 17 25 30 33
-tVOID (261) 1
-tINT (262) 26
-tFLOAT (263) 27
-tDOUBLE (264) 28
-tCHAR (265) 29
-tLONG (266)
-tSIGNED (267)
-tUNSIGNED (268)
-tSHORT (269)
-tCONST (270)
-tINTEGER_NUMBER (271) 15
-tFLOAT_NUMBER (272) 16
-tIF (273)
-tELSE (274)
-tWHILE (275)
-tSWITCH (276)
-tFOR (277)
-tDO (278)
-tBREAK (279)
-tCONTINUE (280)
-tDEFAULT (281)
-tRETURN (282) 8
-tNEWLINE (283)
-tSPACE (284)
-tEQUAL (285) 30
-tOP (286) 1 23 25
-tCP (287) 1 23 25
-tOCB (288) 2
-tCCB (289) 2
-tOB (290)
-tCB (291)
-tE_MARK (292)
-tI_MARK (293)
-tSEMI_C (294) 4 6 7 8
-tCOMMA (295) 20 22
-tCOLON (296)
-tMUL (297) 10
-tDIV (298) 12
-tADD (299) 9
-tSUB (300) 11
-tMOD (301) 13
-
-
-Non-terminaux, suivis des règles où ils apparaissent
-
-$accept (47)
-    à gauche: 0
-S (48)
-    à gauche: 1, à droite: 0
-BODY (49)
-    à gauche: 2, à droite: 1 5
-STATEMENT (50)
-    à gauche: 3 4 5 6 7 8, à droite: 2 5 6 7 8
-EXPRESSION (51)
-    à gauche: 9 10 11 12 13 14 15 16 17, à droite: 7 8 9 10 11 12
-    13 19 20 21 22 30
-FUNCTION_ARGS (52)
-    à gauche: 18 19 20, à droite: 25
-FUNCTION_ARGS_NOT_EMPTY (53)
-    à gauche: 21 22, à droite: 20 22 23
-PRINTF (54)
-    à gauche: 23, à droite: 24
-FUNCTION_CALL (55)
-    à gauche: 24 25, à droite: 14
-TYPE (56)
-    à gauche: 26 27 28 29, à droite: 31 33
-ASSIGNMENT (57)
-    à gauche: 30, à droite: 31
-DELCARATION_AND_ASSIGNMENT (58)
-    à gauche: 31, à droite: 32
-DECLARATION (59)
-    à gauche: 32 33, à droite: 6
+    $end (0) 0
+    error (256)
+    tMAIN (258) 1
+    tPRINTF (259) 23
+    tIDENTIFIER <string> (260) 17 25 30 33
+    tVOID <string> (261) 1
+    tINT <string> (262) 26
+    tFLOAT <string> (263) 27
+    tDOUBLE <string> (264) 28
+    tCHAR <string> (265) 29
+    tLONG <string> (266)
+    tSIGNED <string> (267)
+    tUNSIGNED <string> (268)
+    tSHORT <string> (269)
+    tCONST <string> (270)
+    tINTEGER_NUMBER <integer_nb> (271) 15
+    tFLOAT_NUMBER <float_nb> (272) 16
+    tIF <float_nb> (273)
+    tELSE <float_nb> (274)
+    tWHILE <float_nb> (275)
+    tSWITCH <float_nb> (276)
+    tFOR <float_nb> (277)
+    tDO <float_nb> (278)
+    tBREAK <float_nb> (279)
+    tCONTINUE <float_nb> (280)
+    tDEFAULT <float_nb> (281)
+    tRETURN <float_nb> (282) 8
+    tNEWLINE <float_nb> (283)
+    tSPACE <float_nb> (284)
+    tEQUAL <float_nb> (285) 30
+    tOP <float_nb> (286) 1 23 25
+    tCP <float_nb> (287) 1 23 25
+    tOCB <float_nb> (288) 2
+    tCCB <float_nb> (289) 2
+    tOB <float_nb> (290)
+    tCB <float_nb> (291)
+    tE_MARK <float_nb> (292)
+    tI_MARK <float_nb> (293)
+    tSEMI_C <float_nb> (294) 4 6 7 8
+    tCOMMA <float_nb> (295) 20 22
+    tCOLON <float_nb> (296)
+    tMUL <float_nb> (297) 10
+    tDIV <float_nb> (298) 12
+    tADD <float_nb> (299) 9
+    tSUB <float_nb> (300) 11
+    tMOD <float_nb> (301) 13
 
 
-État 0
+Nonterminals, with rules where they appear
+
+    $accept (47)
+        on left: 0
+    S (48)
+        on left: 1
+        on right: 0
+    BODY (49)
+        on left: 2
+        on right: 1 5
+    STATEMENT (50)
+        on left: 3 4 5 6 7 8
+        on right: 2 5 6 7 8
+    EXPRESSION <integer_nb> (51)
+        on left: 9 10 11 12 13 14 15 16 17
+        on right: 7 8 9 10 11 12 13 19 20 21 22 30
+    FUNCTION_ARGS (52)
+        on left: 18 19 20
+        on right: 25
+    FUNCTION_ARGS_NOT_EMPTY (53)
+        on left: 21 22
+        on right: 20 22 23
+    PRINTF (54)
+        on left: 23
+        on right: 24
+    FUNCTION_CALL (55)
+        on left: 24 25
+        on right: 14
+    TYPE (56)
+        on left: 26 27 28 29
+        on right: 31 33
+    ASSIGNMENT (57)
+        on left: 30
+        on right: 31
+    DELCARATION_AND_ASSIGNMENT (58)
+        on left: 31
+        on right: 32
+    DECLARATION (59)
+        on left: 32 33
+        on right: 6
+
+
+State 0
 
     0 $accept: . S $end
 
-    tVOID  décalage et aller à l'état 1
+    tVOID  shift, and go to state 1
 
-    S  aller à l'état 2
+    S  go to state 2
 
 
-État 1
+State 1
 
     1 S: tVOID . tMAIN tOP tCP BODY
 
-    tMAIN  décalage et aller à l'état 3
+    tMAIN  shift, and go to state 3
 
 
-État 2
+State 2
 
     0 $accept: S . $end
 
-    $end  décalage et aller à l'état 4
+    $end  shift, and go to state 4
 
 
-État 3
+State 3
 
     1 S: tVOID tMAIN . tOP tCP BODY
 
-    tOP  décalage et aller à l'état 5
+    tOP  shift, and go to state 5
 
 
-État 4
+State 4
 
     0 $accept: S $end .
 
-    $défaut  accepter
+    $default  accept
 
 
-État 5
+State 5
 
     1 S: tVOID tMAIN tOP . tCP BODY
 
-    tCP  décalage et aller à l'état 6
+    tCP  shift, and go to state 6
 
 
-État 6
+State 6
 
     1 S: tVOID tMAIN tOP tCP . BODY
 
-    tOCB  décalage et aller à l'état 7
+    tOCB  shift, and go to state 7
 
-    BODY  aller à l'état 8
+    BODY  go to state 8
 
 
-État 7
+State 7
 
     2 BODY: tOCB . STATEMENT tCCB
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINT             décalage et aller à l'état 11
-    tFLOAT           décalage et aller à l'état 12
-    tDOUBLE          décalage et aller à l'état 13
-    tCHAR            décalage et aller à l'état 14
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
-    tRETURN          décalage et aller à l'état 17
-    tOCB             décalage et aller à l'état 7
-    tSEMI_C          décalage et aller à l'état 18
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINT             shift, and go to state 11
+    tFLOAT           shift, and go to state 12
+    tDOUBLE          shift, and go to state 13
+    tCHAR            shift, and go to state 14
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
+    tRETURN          shift, and go to state 17
+    tOCB             shift, and go to state 7
+    tSEMI_C          shift, and go to state 18
 
-    $défaut  réduction par utilisation de la règle 3 (STATEMENT)
+    $default  reduce using rule 3 (STATEMENT)
 
-    BODY                        aller à l'état 19
-    STATEMENT                   aller à l'état 20
-    EXPRESSION                  aller à l'état 21
-    PRINTF                      aller à l'état 22
-    FUNCTION_CALL               aller à l'état 23
-    TYPE                        aller à l'état 24
-    DELCARATION_AND_ASSIGNMENT  aller à l'état 25
-    DECLARATION                 aller à l'état 26
+    BODY                        go to state 19
+    STATEMENT                   go to state 20
+    EXPRESSION                  go to state 21
+    PRINTF                      go to state 22
+    FUNCTION_CALL               go to state 23
+    TYPE                        go to state 24
+    DELCARATION_AND_ASSIGNMENT  go to state 25
+    DECLARATION                 go to state 26
 
 
-État 8
+State 8
 
     1 S: tVOID tMAIN tOP tCP BODY .
 
-    $défaut  réduction par utilisation de la règle 1 (S)
+    $default  reduce using rule 1 (S)
 
 
-État 9
+State 9
 
    23 PRINTF: tPRINTF . tOP FUNCTION_ARGS_NOT_EMPTY tCP
 
-    tOP  décalage et aller à l'état 27
+    tOP  shift, and go to state 27
 
 
-État 10
+State 10
 
    17 EXPRESSION: tIDENTIFIER .
    25 FUNCTION_CALL: tIDENTIFIER . tOP FUNCTION_ARGS tCP
 
-    tOP  décalage et aller à l'état 28
+    tOP  shift, and go to state 28
 
-    $défaut  réduction par utilisation de la règle 17 (EXPRESSION)
+    $default  reduce using rule 17 (EXPRESSION)
 
 
-État 11
+State 11
 
    26 TYPE: tINT .
 
-    $défaut  réduction par utilisation de la règle 26 (TYPE)
+    $default  reduce using rule 26 (TYPE)
 
 
-État 12
+State 12
 
    27 TYPE: tFLOAT .
 
-    $défaut  réduction par utilisation de la règle 27 (TYPE)
+    $default  reduce using rule 27 (TYPE)
 
 
-État 13
+State 13
 
    28 TYPE: tDOUBLE .
 
-    $défaut  réduction par utilisation de la règle 28 (TYPE)
+    $default  reduce using rule 28 (TYPE)
 
 
-État 14
+State 14
 
    29 TYPE: tCHAR .
 
-    $défaut  réduction par utilisation de la règle 29 (TYPE)
+    $default  reduce using rule 29 (TYPE)
 
 
-État 15
+State 15
 
    15 EXPRESSION: tINTEGER_NUMBER .
 
-    $défaut  réduction par utilisation de la règle 15 (EXPRESSION)
+    $default  reduce using rule 15 (EXPRESSION)
 
 
-État 16
+State 16
 
    16 EXPRESSION: tFLOAT_NUMBER .
 
-    $défaut  réduction par utilisation de la règle 16 (EXPRESSION)
+    $default  reduce using rule 16 (EXPRESSION)
 
 
-État 17
+State 17
 
     8 STATEMENT: tRETURN . EXPRESSION tSEMI_C STATEMENT
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 29
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 29
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 18
+State 18
 
     4 STATEMENT: tSEMI_C .
 
-    $défaut  réduction par utilisation de la règle 4 (STATEMENT)
+    $default  reduce using rule 4 (STATEMENT)
 
 
-État 19
+State 19
 
     5 STATEMENT: BODY . STATEMENT
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINT             décalage et aller à l'état 11
-    tFLOAT           décalage et aller à l'état 12
-    tDOUBLE          décalage et aller à l'état 13
-    tCHAR            décalage et aller à l'état 14
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
-    tRETURN          décalage et aller à l'état 17
-    tOCB             décalage et aller à l'état 7
-    tSEMI_C          décalage et aller à l'état 18
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINT             shift, and go to state 11
+    tFLOAT           shift, and go to state 12
+    tDOUBLE          shift, and go to state 13
+    tCHAR            shift, and go to state 14
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
+    tRETURN          shift, and go to state 17
+    tOCB             shift, and go to state 7
+    tSEMI_C          shift, and go to state 18
 
-    $défaut  réduction par utilisation de la règle 3 (STATEMENT)
+    $default  reduce using rule 3 (STATEMENT)
 
-    BODY                        aller à l'état 19
-    STATEMENT                   aller à l'état 30
-    EXPRESSION                  aller à l'état 21
-    PRINTF                      aller à l'état 22
-    FUNCTION_CALL               aller à l'état 23
-    TYPE                        aller à l'état 24
-    DELCARATION_AND_ASSIGNMENT  aller à l'état 25
-    DECLARATION                 aller à l'état 26
+    BODY                        go to state 19
+    STATEMENT                   go to state 30
+    EXPRESSION                  go to state 21
+    PRINTF                      go to state 22
+    FUNCTION_CALL               go to state 23
+    TYPE                        go to state 24
+    DELCARATION_AND_ASSIGNMENT  go to state 25
+    DECLARATION                 go to state 26
 
 
-État 20
+State 20
 
     2 BODY: tOCB STATEMENT . tCCB
 
-    tCCB  décalage et aller à l'état 31
+    tCCB  shift, and go to state 31
 
 
-État 21
+State 21
 
     7 STATEMENT: EXPRESSION . tSEMI_C STATEMENT
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
@@ -366,85 +377,85 @@ DECLARATION (59)
    12           | EXPRESSION . tDIV EXPRESSION
    13           | EXPRESSION . tMOD EXPRESSION
 
-    tSEMI_C  décalage et aller à l'état 32
-    tMUL     décalage et aller à l'état 33
-    tDIV     décalage et aller à l'état 34
-    tADD     décalage et aller à l'état 35
-    tSUB     décalage et aller à l'état 36
-    tMOD     décalage et aller à l'état 37
+    tSEMI_C  shift, and go to state 32
+    tMUL     shift, and go to state 33
+    tDIV     shift, and go to state 34
+    tADD     shift, and go to state 35
+    tSUB     shift, and go to state 36
+    tMOD     shift, and go to state 37
 
 
-État 22
+State 22
 
    24 FUNCTION_CALL: PRINTF .
 
-    $défaut  réduction par utilisation de la règle 24 (FUNCTION_CALL)
+    $default  reduce using rule 24 (FUNCTION_CALL)
 
 
-État 23
+State 23
 
    14 EXPRESSION: FUNCTION_CALL .
 
-    $défaut  réduction par utilisation de la règle 14 (EXPRESSION)
+    $default  reduce using rule 14 (EXPRESSION)
 
 
-État 24
+State 24
 
    31 DELCARATION_AND_ASSIGNMENT: TYPE . ASSIGNMENT
    33 DECLARATION: TYPE . tIDENTIFIER
 
-    tIDENTIFIER  décalage et aller à l'état 38
+    tIDENTIFIER  shift, and go to state 38
 
-    ASSIGNMENT  aller à l'état 39
+    ASSIGNMENT  go to state 39
 
 
-État 25
+State 25
 
    32 DECLARATION: DELCARATION_AND_ASSIGNMENT .
 
-    $défaut  réduction par utilisation de la règle 32 (DECLARATION)
+    $default  reduce using rule 32 (DECLARATION)
 
 
-État 26
+State 26
 
     6 STATEMENT: DECLARATION . tSEMI_C STATEMENT
 
-    tSEMI_C  décalage et aller à l'état 40
+    tSEMI_C  shift, and go to state 40
 
 
-État 27
+State 27
 
    23 PRINTF: tPRINTF tOP . FUNCTION_ARGS_NOT_EMPTY tCP
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION               aller à l'état 41
-    FUNCTION_ARGS_NOT_EMPTY  aller à l'état 42
-    PRINTF                   aller à l'état 22
-    FUNCTION_CALL            aller à l'état 23
+    EXPRESSION               go to state 41
+    FUNCTION_ARGS_NOT_EMPTY  go to state 42
+    PRINTF                   go to state 22
+    FUNCTION_CALL            go to state 23
 
 
-État 28
+State 28
 
    25 FUNCTION_CALL: tIDENTIFIER tOP . FUNCTION_ARGS tCP
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    $défaut  réduction par utilisation de la règle 18 (FUNCTION_ARGS)
+    $default  reduce using rule 18 (FUNCTION_ARGS)
 
-    EXPRESSION     aller à l'état 43
-    FUNCTION_ARGS  aller à l'état 44
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 43
+    FUNCTION_ARGS  go to state 44
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 29
+State 29
 
     8 STATEMENT: tRETURN EXPRESSION . tSEMI_C STATEMENT
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
@@ -453,172 +464,172 @@ DECLARATION (59)
    12           | EXPRESSION . tDIV EXPRESSION
    13           | EXPRESSION . tMOD EXPRESSION
 
-    tSEMI_C  décalage et aller à l'état 45
-    tMUL     décalage et aller à l'état 33
-    tDIV     décalage et aller à l'état 34
-    tADD     décalage et aller à l'état 35
-    tSUB     décalage et aller à l'état 36
-    tMOD     décalage et aller à l'état 37
+    tSEMI_C  shift, and go to state 45
+    tMUL     shift, and go to state 33
+    tDIV     shift, and go to state 34
+    tADD     shift, and go to state 35
+    tSUB     shift, and go to state 36
+    tMOD     shift, and go to state 37
 
 
-État 30
+State 30
 
     5 STATEMENT: BODY STATEMENT .
 
-    $défaut  réduction par utilisation de la règle 5 (STATEMENT)
+    $default  reduce using rule 5 (STATEMENT)
 
 
-État 31
+State 31
 
     2 BODY: tOCB STATEMENT tCCB .
 
-    $défaut  réduction par utilisation de la règle 2 (BODY)
+    $default  reduce using rule 2 (BODY)
 
 
-État 32
+State 32
 
     7 STATEMENT: EXPRESSION tSEMI_C . STATEMENT
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINT             décalage et aller à l'état 11
-    tFLOAT           décalage et aller à l'état 12
-    tDOUBLE          décalage et aller à l'état 13
-    tCHAR            décalage et aller à l'état 14
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
-    tRETURN          décalage et aller à l'état 17
-    tOCB             décalage et aller à l'état 7
-    tSEMI_C          décalage et aller à l'état 18
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINT             shift, and go to state 11
+    tFLOAT           shift, and go to state 12
+    tDOUBLE          shift, and go to state 13
+    tCHAR            shift, and go to state 14
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
+    tRETURN          shift, and go to state 17
+    tOCB             shift, and go to state 7
+    tSEMI_C          shift, and go to state 18
 
-    $défaut  réduction par utilisation de la règle 3 (STATEMENT)
+    $default  reduce using rule 3 (STATEMENT)
 
-    BODY                        aller à l'état 19
-    STATEMENT                   aller à l'état 46
-    EXPRESSION                  aller à l'état 21
-    PRINTF                      aller à l'état 22
-    FUNCTION_CALL               aller à l'état 23
-    TYPE                        aller à l'état 24
-    DELCARATION_AND_ASSIGNMENT  aller à l'état 25
-    DECLARATION                 aller à l'état 26
+    BODY                        go to state 19
+    STATEMENT                   go to state 46
+    EXPRESSION                  go to state 21
+    PRINTF                      go to state 22
+    FUNCTION_CALL               go to state 23
+    TYPE                        go to state 24
+    DELCARATION_AND_ASSIGNMENT  go to state 25
+    DECLARATION                 go to state 26
 
 
-État 33
+State 33
 
    10 EXPRESSION: EXPRESSION tMUL . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 47
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 47
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 34
+State 34
 
    12 EXPRESSION: EXPRESSION tDIV . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 48
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 48
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 35
+State 35
 
     9 EXPRESSION: EXPRESSION tADD . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 49
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 49
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 36
+State 36
 
    11 EXPRESSION: EXPRESSION tSUB . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 50
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 50
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 37
+State 37
 
    13 EXPRESSION: EXPRESSION tMOD . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 51
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 51
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 38
+State 38
 
    30 ASSIGNMENT: tIDENTIFIER . tEQUAL EXPRESSION
    33 DECLARATION: TYPE tIDENTIFIER .
 
-    tEQUAL  décalage et aller à l'état 52
+    tEQUAL  shift, and go to state 52
 
-    $défaut  réduction par utilisation de la règle 33 (DECLARATION)
+    $default  reduce using rule 33 (DECLARATION)
 
 
-État 39
+State 39
 
    31 DELCARATION_AND_ASSIGNMENT: TYPE ASSIGNMENT .
 
-    $défaut  réduction par utilisation de la règle 31 (DELCARATION_AND_ASSIGNMENT)
+    $default  reduce using rule 31 (DELCARATION_AND_ASSIGNMENT)
 
 
-État 40
+State 40
 
     6 STATEMENT: DECLARATION tSEMI_C . STATEMENT
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINT             décalage et aller à l'état 11
-    tFLOAT           décalage et aller à l'état 12
-    tDOUBLE          décalage et aller à l'état 13
-    tCHAR            décalage et aller à l'état 14
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
-    tRETURN          décalage et aller à l'état 17
-    tOCB             décalage et aller à l'état 7
-    tSEMI_C          décalage et aller à l'état 18
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINT             shift, and go to state 11
+    tFLOAT           shift, and go to state 12
+    tDOUBLE          shift, and go to state 13
+    tCHAR            shift, and go to state 14
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
+    tRETURN          shift, and go to state 17
+    tOCB             shift, and go to state 7
+    tSEMI_C          shift, and go to state 18
 
-    $défaut  réduction par utilisation de la règle 3 (STATEMENT)
+    $default  reduce using rule 3 (STATEMENT)
 
-    BODY                        aller à l'état 19
-    STATEMENT                   aller à l'état 53
-    EXPRESSION                  aller à l'état 21
-    PRINTF                      aller à l'état 22
-    FUNCTION_CALL               aller à l'état 23
-    TYPE                        aller à l'état 24
-    DELCARATION_AND_ASSIGNMENT  aller à l'état 25
-    DECLARATION                 aller à l'état 26
+    BODY                        go to state 19
+    STATEMENT                   go to state 53
+    EXPRESSION                  go to state 21
+    PRINTF                      go to state 22
+    FUNCTION_CALL               go to state 23
+    TYPE                        go to state 24
+    DELCARATION_AND_ASSIGNMENT  go to state 25
+    DECLARATION                 go to state 26
 
 
-État 41
+State 41
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -628,24 +639,24 @@ DECLARATION (59)
    21 FUNCTION_ARGS_NOT_EMPTY: EXPRESSION .
    22                        | EXPRESSION . tCOMMA FUNCTION_ARGS_NOT_EMPTY
 
-    tCOMMA  décalage et aller à l'état 54
-    tMUL    décalage et aller à l'état 33
-    tDIV    décalage et aller à l'état 34
-    tADD    décalage et aller à l'état 35
-    tSUB    décalage et aller à l'état 36
-    tMOD    décalage et aller à l'état 37
+    tCOMMA  shift, and go to state 54
+    tMUL    shift, and go to state 33
+    tDIV    shift, and go to state 34
+    tADD    shift, and go to state 35
+    tSUB    shift, and go to state 36
+    tMOD    shift, and go to state 37
 
-    $défaut  réduction par utilisation de la règle 21 (FUNCTION_ARGS_NOT_EMPTY)
+    $default  reduce using rule 21 (FUNCTION_ARGS_NOT_EMPTY)
 
 
-État 42
+State 42
 
    23 PRINTF: tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY . tCP
 
-    tCP  décalage et aller à l'état 55
+    tCP  shift, and go to state 55
 
 
-État 43
+State 43
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -655,59 +666,59 @@ DECLARATION (59)
    19 FUNCTION_ARGS: EXPRESSION .
    20              | EXPRESSION . tCOMMA FUNCTION_ARGS_NOT_EMPTY
 
-    tCOMMA  décalage et aller à l'état 56
-    tMUL    décalage et aller à l'état 33
-    tDIV    décalage et aller à l'état 34
-    tADD    décalage et aller à l'état 35
-    tSUB    décalage et aller à l'état 36
-    tMOD    décalage et aller à l'état 37
+    tCOMMA  shift, and go to state 56
+    tMUL    shift, and go to state 33
+    tDIV    shift, and go to state 34
+    tADD    shift, and go to state 35
+    tSUB    shift, and go to state 36
+    tMOD    shift, and go to state 37
 
-    $défaut  réduction par utilisation de la règle 19 (FUNCTION_ARGS)
+    $default  reduce using rule 19 (FUNCTION_ARGS)
 
 
-État 44
+State 44
 
    25 FUNCTION_CALL: tIDENTIFIER tOP FUNCTION_ARGS . tCP
 
-    tCP  décalage et aller à l'état 57
+    tCP  shift, and go to state 57
 
 
-État 45
+State 45
 
     8 STATEMENT: tRETURN EXPRESSION tSEMI_C . STATEMENT
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINT             décalage et aller à l'état 11
-    tFLOAT           décalage et aller à l'état 12
-    tDOUBLE          décalage et aller à l'état 13
-    tCHAR            décalage et aller à l'état 14
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
-    tRETURN          décalage et aller à l'état 17
-    tOCB             décalage et aller à l'état 7
-    tSEMI_C          décalage et aller à l'état 18
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINT             shift, and go to state 11
+    tFLOAT           shift, and go to state 12
+    tDOUBLE          shift, and go to state 13
+    tCHAR            shift, and go to state 14
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
+    tRETURN          shift, and go to state 17
+    tOCB             shift, and go to state 7
+    tSEMI_C          shift, and go to state 18
 
-    $défaut  réduction par utilisation de la règle 3 (STATEMENT)
+    $default  reduce using rule 3 (STATEMENT)
 
-    BODY                        aller à l'état 19
-    STATEMENT                   aller à l'état 58
-    EXPRESSION                  aller à l'état 21
-    PRINTF                      aller à l'état 22
-    FUNCTION_CALL               aller à l'état 23
-    TYPE                        aller à l'état 24
-    DELCARATION_AND_ASSIGNMENT  aller à l'état 25
-    DECLARATION                 aller à l'état 26
+    BODY                        go to state 19
+    STATEMENT                   go to state 58
+    EXPRESSION                  go to state 21
+    PRINTF                      go to state 22
+    FUNCTION_CALL               go to state 23
+    TYPE                        go to state 24
+    DELCARATION_AND_ASSIGNMENT  go to state 25
+    DECLARATION                 go to state 26
 
 
-État 46
+State 46
 
     7 STATEMENT: EXPRESSION tSEMI_C STATEMENT .
 
-    $défaut  réduction par utilisation de la règle 7 (STATEMENT)
+    $default  reduce using rule 7 (STATEMENT)
 
 
-État 47
+State 47
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -716,10 +727,10 @@ DECLARATION (59)
    12           | EXPRESSION . tDIV EXPRESSION
    13           | EXPRESSION . tMOD EXPRESSION
 
-    $défaut  réduction par utilisation de la règle 10 (EXPRESSION)
+    $default  reduce using rule 10 (EXPRESSION)
 
 
-État 48
+State 48
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -728,10 +739,10 @@ DECLARATION (59)
    12           | EXPRESSION tDIV EXPRESSION .
    13           | EXPRESSION . tMOD EXPRESSION
 
-    $défaut  réduction par utilisation de la règle 12 (EXPRESSION)
+    $default  reduce using rule 12 (EXPRESSION)
 
 
-État 49
+State 49
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
     9           | EXPRESSION tADD EXPRESSION .
@@ -740,14 +751,14 @@ DECLARATION (59)
    12           | EXPRESSION . tDIV EXPRESSION
    13           | EXPRESSION . tMOD EXPRESSION
 
-    tMUL  décalage et aller à l'état 33
-    tDIV  décalage et aller à l'état 34
-    tMOD  décalage et aller à l'état 37
+    tMUL  shift, and go to state 33
+    tDIV  shift, and go to state 34
+    tMOD  shift, and go to state 37
 
-    $défaut  réduction par utilisation de la règle 9 (EXPRESSION)
+    $default  reduce using rule 9 (EXPRESSION)
 
 
-État 50
+State 50
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -756,14 +767,14 @@ DECLARATION (59)
    12           | EXPRESSION . tDIV EXPRESSION
    13           | EXPRESSION . tMOD EXPRESSION
 
-    tMUL  décalage et aller à l'état 33
-    tDIV  décalage et aller à l'état 34
-    tMOD  décalage et aller à l'état 37
+    tMUL  shift, and go to state 33
+    tDIV  shift, and go to state 34
+    tMOD  shift, and go to state 37
 
-    $défaut  réduction par utilisation de la règle 11 (EXPRESSION)
+    $default  reduce using rule 11 (EXPRESSION)
 
 
-État 51
+State 51
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -772,82 +783,82 @@ DECLARATION (59)
    13           | EXPRESSION . tMOD EXPRESSION
    13           | EXPRESSION tMOD EXPRESSION .
 
-    $défaut  réduction par utilisation de la règle 13 (EXPRESSION)
+    $default  reduce using rule 13 (EXPRESSION)
 
 
-État 52
+State 52
 
    30 ASSIGNMENT: tIDENTIFIER tEQUAL . EXPRESSION
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION     aller à l'état 59
-    PRINTF         aller à l'état 22
-    FUNCTION_CALL  aller à l'état 23
+    EXPRESSION     go to state 59
+    PRINTF         go to state 22
+    FUNCTION_CALL  go to state 23
 
 
-État 53
+State 53
 
     6 STATEMENT: DECLARATION tSEMI_C STATEMENT .
 
-    $défaut  réduction par utilisation de la règle 6 (STATEMENT)
+    $default  reduce using rule 6 (STATEMENT)
 
 
-État 54
+State 54
 
    22 FUNCTION_ARGS_NOT_EMPTY: EXPRESSION tCOMMA . FUNCTION_ARGS_NOT_EMPTY
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION               aller à l'état 41
-    FUNCTION_ARGS_NOT_EMPTY  aller à l'état 60
-    PRINTF                   aller à l'état 22
-    FUNCTION_CALL            aller à l'état 23
+    EXPRESSION               go to state 41
+    FUNCTION_ARGS_NOT_EMPTY  go to state 60
+    PRINTF                   go to state 22
+    FUNCTION_CALL            go to state 23
 
 
-État 55
+State 55
 
    23 PRINTF: tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY tCP .
 
-    $défaut  réduction par utilisation de la règle 23 (PRINTF)
+    $default  reduce using rule 23 (PRINTF)
 
 
-État 56
+State 56
 
    20 FUNCTION_ARGS: EXPRESSION tCOMMA . FUNCTION_ARGS_NOT_EMPTY
 
-    tPRINTF          décalage et aller à l'état 9
-    tIDENTIFIER      décalage et aller à l'état 10
-    tINTEGER_NUMBER  décalage et aller à l'état 15
-    tFLOAT_NUMBER    décalage et aller à l'état 16
+    tPRINTF          shift, and go to state 9
+    tIDENTIFIER      shift, and go to state 10
+    tINTEGER_NUMBER  shift, and go to state 15
+    tFLOAT_NUMBER    shift, and go to state 16
 
-    EXPRESSION               aller à l'état 41
-    FUNCTION_ARGS_NOT_EMPTY  aller à l'état 61
-    PRINTF                   aller à l'état 22
-    FUNCTION_CALL            aller à l'état 23
+    EXPRESSION               go to state 41
+    FUNCTION_ARGS_NOT_EMPTY  go to state 61
+    PRINTF                   go to state 22
+    FUNCTION_CALL            go to state 23
 
 
-État 57
+State 57
 
    25 FUNCTION_CALL: tIDENTIFIER tOP FUNCTION_ARGS tCP .
 
-    $défaut  réduction par utilisation de la règle 25 (FUNCTION_CALL)
+    $default  reduce using rule 25 (FUNCTION_CALL)
 
 
-État 58
+State 58
 
     8 STATEMENT: tRETURN EXPRESSION tSEMI_C STATEMENT .
 
-    $défaut  réduction par utilisation de la règle 8 (STATEMENT)
+    $default  reduce using rule 8 (STATEMENT)
 
 
-État 59
+State 59
 
     9 EXPRESSION: EXPRESSION . tADD EXPRESSION
    10           | EXPRESSION . tMUL EXPRESSION
@@ -856,24 +867,24 @@ DECLARATION (59)
    13           | EXPRESSION . tMOD EXPRESSION
    30 ASSIGNMENT: tIDENTIFIER tEQUAL EXPRESSION .
 
-    tMUL  décalage et aller à l'état 33
-    tDIV  décalage et aller à l'état 34
-    tADD  décalage et aller à l'état 35
-    tSUB  décalage et aller à l'état 36
-    tMOD  décalage et aller à l'état 37
+    tMUL  shift, and go to state 33
+    tDIV  shift, and go to state 34
+    tADD  shift, and go to state 35
+    tSUB  shift, and go to state 36
+    tMOD  shift, and go to state 37
 
-    $défaut  réduction par utilisation de la règle 30 (ASSIGNMENT)
+    $default  reduce using rule 30 (ASSIGNMENT)
 
 
-État 60
+State 60
 
    22 FUNCTION_ARGS_NOT_EMPTY: EXPRESSION tCOMMA FUNCTION_ARGS_NOT_EMPTY .
 
-    $défaut  réduction par utilisation de la règle 22 (FUNCTION_ARGS_NOT_EMPTY)
+    $default  reduce using rule 22 (FUNCTION_ARGS_NOT_EMPTY)
 
 
-État 61
+State 61
 
    20 FUNCTION_ARGS: EXPRESSION tCOMMA FUNCTION_ARGS_NOT_EMPTY .
 
-    $défaut  réduction par utilisation de la règle 20 (FUNCTION_ARGS)
+    $default  reduce using rule 20 (FUNCTION_ARGS)
