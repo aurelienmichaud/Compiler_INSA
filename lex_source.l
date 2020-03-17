@@ -19,6 +19,7 @@ NEWLINE	[\n]+
 BLANKS	(({SPACE})|({NEWLINE}))+
 
 %%
+
 "("		{ return tOP; } 
 ")"		{ return tCP; }
 "{"		{ return tOCB; } 
@@ -93,7 +94,6 @@ printf		{ return tPRINTF; }
 
 {NEWLINE}	{ }    
 {SPACE}		{ }
-
 
 %%
 

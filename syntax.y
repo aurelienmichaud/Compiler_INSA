@@ -188,10 +188,13 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				if (v == NULL) {
 					v = add_var($1);
 				}
+
+				/* $1 is actually yylval.string */
+				free(yylval.string);
 				
 				/* For now we return the id only because we needed to return an integer number */
 				$$ = v->id;
-				printf("[IDENTIFIER = %s]\n", $1);
+				printf("[IDENTIFIER = %s]\n", v->identifier);
 			}
 		;
            
