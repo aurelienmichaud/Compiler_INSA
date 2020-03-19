@@ -54,9 +54,9 @@
 		int i;
 		for (i = 0; i < vars_index; i++) {
 			if (strcmp(vars[i].identifier, identifier) == 0)
-				break;
+				return &(vars[i]);
 		}
-		return (i == vars_index) ? NULL : &(vars[i]) ;
+		return NULL;
 	}
 
 	Variable *add_var(char *identifier) {
@@ -209,7 +209,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
                 
 		| FUNCTION_CALL
 			{
-				printf("[FUNCTION_CALL]\n");
+				/*printf("[FUNCTION_CALL]\n");*/
 			}  
 
 
@@ -232,7 +232,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 				if (v == NULL) {
 					ABORT_ON_ERROR1("Unknown identifier '%s'", $1);
-					v = add_var($1);
+					/*v = add_var($1);*/
 				}
 
 				/* $1 is actually yylval.string */
