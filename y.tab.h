@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.5.2.  */
+/* A Bison parser, made by GNU Bison 3.5.3.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -145,7 +145,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 56 "syntax.y"
+#line 83 "syntax.y"
  
 		int integer_nb;
 		float float_nb;

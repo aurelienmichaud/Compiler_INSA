@@ -1,4 +1,5 @@
 void main() {
 	int a = 123 + 13;
-	printf(a);
+	int b = a + 12;
+	printf(b);
 }

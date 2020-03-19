@@ -4,7 +4,30 @@
 	#include <stdlib.h>
 	#include <string.h>
 
+	#define ABORT_ON_ERROR1(MSG, VAR1)	\
+		do {				\
+			printf("[*] ERROR: ");	\
+			printf(MSG, VAR1);	\
+			printf("\n");		\
+						\
+			exit(1);		\
+		} while(0)
+
+	#define	push_from_addr(A)	do { printf("push [%d]\n", (A)); } while(0)
+	#define	push(A)			do { printf("push %d\n", (A)); } while(0)
+
+	#define pop_to_addr(A)		do { printf("pop [%d]", (A)); } while(0)
+	#define pop()			do { printf("pop\n"); } while(0)
+
+	#define call(Label)		do { printf("call %s\n", Label); } while(0)
+
+	#define cmp(A, B)		do { printf("cmp %d, %d\n", (A), (B)); } while(0)
+
+	#define print(ADDR)		do { printf("pri %d\n", (ADDR)); } while(0)
+
 	#define VAR_TABLE_SIZE	100
+	#define INT_BYTE_SIZE	0x4
+
 
 	int yydebug = 1; 
 
@@ -19,12 +42,13 @@
 	typedef struct _Variable {
 		int id;
 		char *identifier;	
-		long address;
+		int address;
 
 	} Variable;
 
 	Variable vars[VAR_TABLE_SIZE];
-	int vars_index;
+	int vars_index = 0;
+	int current_address = 0;
 
 	Variable *get_var(char *identifier) {
 		int i;
@@ -40,8 +64,11 @@
 			return NULL;
 		}	
 
-		vars[vars_index].identifier = strdup(identifier);
-		vars[vars_index].id = vars_index;
+		vars[vars_index].identifier	= strdup(identifier);
+		vars[vars_index].id		= vars_index;
+		vars[vars_index].address	= current_address;
+
+		current_address += INT_BYTE_SIZE;
 
 		return &(vars[vars_index++]);
 	}
@@ -60,67 +87,68 @@
 	}
 
 %token
-	tMAIN
-	tPRINTF
+			tMAIN
+			tPRINTF
 
-	<string> tIDENTIFIER
+	<string>	tIDENTIFIER
 
-	tVOID
-	tINT
-	tFLOAT
-	tDOUBLE
-	tCHAR
+			tVOID
+			tINT
+			tFLOAT
+			tDOUBLE
+			tCHAR
 
-	tLONG
-	tSIGNED
-	tUNSIGNED
-	tSHORT
-	tCONST
+			tLONG
+			tSIGNED
+			tUNSIGNED
+			tSHORT
+			tCONST
 
 	<integer_nb> 	tINTEGER_NUMBER 
 	<float_nb>	tFLOAT_NUMBER
 
-	tIF
-	tELSE
-	tWHILE
-	tSWITCH
-	tFOR
-	tDO
+			tIF
+			tELSE
+			tWHILE
+			tSWITCH
+			tFOR
+			tDO
 
-	tBREAK
-	tCONTINUE
-	tDEFAULT
+			tBREAK
+			tCONTINUE
+			tDEFAULT
 
-	tRETURN
+			tRETURN
 
-	tNEWLINE
-	tSPACE
+			tNEWLINE
+			tSPACE
 
-	tEQUAL
+			tEQUAL
 
-	tOP
-	tCP
-	tOCB
-	tCCB
-	tOB
-	tCB
+			tOP
+			tCP
+			tOCB
+			tCCB
+			tOB
+			tCB
 
-	tE_MARK
-	tI_MARK
+			tE_MARK
+			tI_MARK
 
-	tSEMI_C
-	tCOMMA
-	tCOLON
+			tSEMI_C
+			tCOMMA
+			tCOLON
 
-	tMUL
-	tDIV
-	tADD
-	tSUB
-	tMOD
+			tMUL
+			tDIV
+			tADD
+			tSUB
+			tMOD
 
 
 %left tADD tSUB
 %left tMUL tDIV tMOD
+
 %type <integer_nb> EXPRESSION
 
 %%
@@ -140,6 +168,8 @@ STATEMENT :	/* NOTHING */
 		| EXPRESSION tSEMI_C STATEMENT
 			{ printf("[EXPRESSION tSEMI_C]\n"); }
 
+		| IF
+
 		| tRETURN EXPRESSION tSEMI_C STATEMENT
 			{ printf("[RETURN]\n"); }
            	;
@@ -148,31 +178,46 @@ STATEMENT :	/* NOTHING */
            
 EXPRESSION :	EXPRESSION tADD EXPRESSION
 			{ 
-				printf("[%d + %d]\n", $1, $3);
-				printf("add %s, %d, %d\n", "eax", $1, $3);
+				printf("add [esp+0x4], [esp]\n");
+				pop();
+			}
+
+		| EXPRESSION tSUB EXPRESSION
+			{ 
+				printf("sub [esp+0x4], [esp]\n");
+				pop();
 			}
                 
 		| EXPRESSION tMUL EXPRESSION
-			{ printf("[%d * %d]\n", $1, $3); }
-
-		| EXPRESSION tSUB EXPRESSION
-			{ printf("[%d / %d]\n", $1, $3); }
+			{ 
+				printf("mul [esp+0x4], [esp]\n");
+				pop();
+			}
 
 		| EXPRESSION tDIV EXPRESSION
-			{ printf("[DIV]\n"); }
+			{ 
+				printf("div [esp+0x4], [esp]\n");
+				pop();
+			}
 
 		| EXPRESSION tMOD EXPRESSION
-			{ printf("[MODULO]\n"); }
+			{ 
+				printf("mod [esp+0x4], [esp]\n");
+				pop();
+			}
                 
                 
 		| FUNCTION_CALL
-			{ printf("[FUNCTION_CALL]\n"); }  
+			{
+				printf("[FUNCTION_CALL]\n");
+			}  
 
 
 		| tINTEGER_NUMBER
 			{ 
 				$$ = $1;
-				printf("[INTEGER_NUMBER = %d]\n", $$);
+				/*printf("[INTEGER_NUMBER = %d]\n", $$);*/
+				push($$);
 			}
 
 		| tFLOAT_NUMBER
@@ -186,6 +231,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Variable *v = get_var($1);
 
 				if (v == NULL) {
+					ABORT_ON_ERROR1("Unknown identifier '%s'", $1);
 					v = add_var($1);
 				}
 
@@ -193,8 +239,10 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				free(yylval.string);
 				
 				/* For now we return the id only because we needed to return an integer number */
-				$$ = v->id;
+				$$ = v->address;
+				
 				printf("[IDENTIFIER = %s]\n", v->identifier);
+				push_from_addr(v->address);
 			}
 		;
            
@@ -208,13 +256,17 @@ FUNCTION_ARGS_NOT_EMPTY :	EXPRESSION
 				;
            
 PRINTF :	tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY tCP
-			{ printf("[PRINTF]\n"); }
+			{
+			}
 		;
              
  
              
 FUNCTION_CALL :	PRINTF
 		| tIDENTIFIER tOP FUNCTION_ARGS tCP
+			{
+				call($1);
+			}
 		;
            
 TYPE :	tINT
@@ -223,15 +275,31 @@ TYPE :	tINT
 	| tCHAR
 	;
            
+/*
 ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
-			{ printf("[ASSIGNMENT]\n"); }
-		;
+			{
+				Variable *v = get_var($1);
 
-DELCARATION_AND_ASSIGNMENT :	TYPE ASSIGNMENT ;
+				printf("[ASSIGNMENT]\n");
+				pop_to_addr(v->address);
+			}
+		;
+*/
+
+DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
+					{
+						Variable *v = add_var($2);
+						pop_to_addr(v->address);
+					}
+				;
        
-DECLARATION :	DELCARATION_AND_ASSIGNMENT
+DECLARATION :	DECLARATION_AND_ASSIGNMENT
 		| TYPE tIDENTIFIER
 		;
+
+IF :	tIF tOP EXPRESSION tCP BODY
+		{
+		}
               
 %%
 
