@@ -4,6 +4,8 @@
 	#include <stdlib.h>
 	#include <string.h>
 
+	#include "symbol_table.h"
+
 	#define ABORT_ON_ERROR1(MSG, VAR1)	\
 		do {				\
 			printf("[*] ERROR: ");	\
@@ -25,10 +27,6 @@
 
 	#define print(ADDR)		do { printf("pri %d\n", (ADDR)); } while(0)
 
-	#define VAR_TABLE_SIZE	100
-	#define INT_BYTE_SIZE	0x4
-
-
 	int yydebug = 1; 
 
 	extern int yylex();
@@ -38,45 +36,6 @@
 		exit(1);
 		return 1;
 	}
-
-	typedef struct _Variable {
-		int id;
-		char *identifier;	
-		int address;
-
-	} Variable;
-
-	Variable vars[VAR_TABLE_SIZE];
-	int vars_index = 0;
-	int current_address = 0;
-
-	Variable *get_var(char *identifier) {
-		int i;
-		for (i = 0; i < vars_index; i++) {
-			if (strcmp(vars[i].identifier, identifier) == 0)
-				return &(vars[i]);
-		}
-		return NULL;
-	}
-
-	Variable *add_var(char *identifier) {
-		if (vars_index == VAR_TABLE_SIZE) {
-			return NULL;
-		}	
-
-		vars[vars_index].identifier	= strdup(identifier);
-		vars[vars_index].id		= vars_index;
-		vars[vars_index].address	= current_address;
-
-		current_address += INT_BYTE_SIZE;
-
-		return &(vars[vars_index++]);
-	}
-
-	void init() {
-		memset(vars, 0, VAR_TABLE_SIZE * sizeof(*vars));
-	}
-
 %}
 
 
@@ -228,9 +187,9 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 		| tIDENTIFIER
 			{
-				Variable *v = get_var($1);
+				Symbol *s = symbol_table_get_symbol($1);
 
-				if (v == NULL) {
+				if (s == NULL) {
 					ABORT_ON_ERROR1("Unknown identifier '%s'", $1);
 					/*v = add_var($1);*/
 				}
@@ -239,10 +198,10 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				free(yylval.string);
 				
 				/* For now we return the id only because we needed to return an integer number */
-				$$ = v->address;
+				$$ = s->address;
 				
-				printf("[IDENTIFIER = %s]\n", v->identifier);
-				push_from_addr(v->address);
+				printf("[IDENTIFIER = %s]\n", s->identifier);
+				push_from_addr(s->address);
 			}
 		;
            
@@ -278,18 +237,18 @@ TYPE :	tINT
 /*
 ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 			{
-				Variable *v = get_var($1);
+				Symbol *s = symbol_table_get_symbol($1);
 
 				printf("[ASSIGNMENT]\n");
-				pop_to_addr(v->address);
+				pop_to_addr(s->address);
 			}
 		;
 */
 
 DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 					{
-						Variable *v = add_var($2);
-						pop_to_addr(v->address);
+						Symbol *s = symbol_table_add_symbol($2);
+						pop_to_addr(s->address);
 					}
 				;
        
@@ -305,7 +264,7 @@ IF :	tIF tOP EXPRESSION tCP BODY
 
 int main(void)
 {
-	init();
+	init_symbol_table();
 	yylval.string = NULL;
 
 	yyparse();

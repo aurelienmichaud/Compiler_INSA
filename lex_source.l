@@ -2,7 +2,9 @@
 %{
 	#include <stdlib.h>
 	#include <string.h>
+
 	#include "y.tab.h"
+	#include "symbol_table.h"
 %}
 
 DIGIT	[0-9]
@@ -22,8 +24,14 @@ BLANKS	(({SPACE})|({NEWLINE}))+
 
 "("		{ return tOP; } 
 ")"		{ return tCP; }
-"{"		{ return tOCB; } 
-"}"		{ return tCCB; }
+"{"		{
+			symbol_table_increase_depth();
+			return tOCB;
+		} 
+"}"		{
+			symbol_table_decrease_depth();
+			return tCCB;
+		}
 "["		{ return tOB; } 
 "]"		{ return tCB; }
 
