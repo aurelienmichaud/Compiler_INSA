@@ -19,4 +19,4 @@ lex.yy.o: lex_source.l
 .PHONY: clean
 
 clean:
-	rm -f a.out y.tab.o y.tab.c lex.yy.c lex.yy.o
+	rm -f a.out symbol_table.o y.tab.o y.tab.c lex.yy.c lex.yy.o
