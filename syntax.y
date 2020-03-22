@@ -5,6 +5,7 @@
 	#include <string.h>
 
 	#include "symbol_table.h"
+	#include "asm.h"
 
 	#define ABORT_ON_ERROR1(MSG, VAR1)		\
 		do {					\
@@ -22,51 +23,6 @@
 			fprintf(stderr, "\n");			\
 		} while(0)
 
-
-
-	FILE* out;
-
-	void init_output(FILE *f)
-	{
-		out = f;
-	}
-
-
-	#define asm_print0(__STRING__)					do { fprintf(out, __STRING__"\n"); } while(0)
-	#define asm_print1(__STRING__, __VAR1__)			do { fprintf(out, __STRING__"\n", (__VAR1__)); } while(0)
-	#define asm_print2(__STRING__, __VAR1__, __VAR2__)		do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__)); } while(0)
-	#define asm_print3(__STRING__, __VAR1__, __VAR2__, __VAR3__)	do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__), (__VAR3__)); } while(0)
-
-	#define asm_comment(__MSG__)					do { asm_print0("; "__MSG__); } while(0)
-	#define asm_comment1(__MSG__, __VAR1__)				do { asm_print1("; "__MSG__, (__VAR1__)); } while(0)
-	#define asm_comment2(__MSG__, __VAR1__, __VAR2__)		do { asm_print1("; "__MSG__, (__VAR1__), (__VAR2__)); } while(0)
-
-	#define asm_AFC(__ADDRESS__, __VALUE__)			do { asm_print2("AFC @%d, 0x%x", (__ADDRESS__), (__VALUE__)); } while(0)
-
-	#define asm_COP(__TO__, __FROM__)			do { asm_print2("COP @%d, @%d", (__TO__), (__FROM__)); } while(0)
-
-	#define asm_ADD(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("ADD @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-	#define asm_MUL(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("MUL @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-	#define asm_SUB(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("SOU @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-
-	static inline void asm_push(int value)
-	{
-		Symbol *s = symbol_table_add_tmp_symbol();
-
-		asm_AFC(s->address, value);
-	}
-
-	static inline void asm_push_from_address(int address)
-	{
-		Symbol *s = symbol_table_add_tmp_symbol();
-
-		asm_COP(s->address, address);
-	}
-
-	static inline Symbol *asm_pop()
-	{
-		return symbol_table_pop();
-	}
 
 	int yydebug = 1; 
 
@@ -284,7 +240,7 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 						Symbol *expr = asm_pop();
 
 						asm_COP(s->address, expr->address);
-						asm_comment1("Declaration & assignment of '%s'", $2);
+						asm_comment("Declaration & assignment");
 					}
 				| tCONST TYPE tIDENTIFIER tEQUAL EXPRESSION
 					{
@@ -297,7 +253,7 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 						Symbol *expr = asm_pop();
 
 						asm_COP(s->address, expr->address);
-						asm_comment1("Declaration & assignment of constant '%s'", $3);
+						asm_comment("Declaration & assignment of constant");
 					}
 				;
        
@@ -338,7 +294,7 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
 				}
 
-				asm_comment1("Assignment of '%s'", $1);
+				asm_comment("Assignment");
 			}
 		;
 
