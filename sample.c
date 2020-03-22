@@ -4,10 +4,15 @@ void main() {
 
 	{
 		int c = 12;
+		int a = 3;
+		c = a;
 		printf(c);
 	}
 
 	printf(a);
+	int d = 10;
+
+	b = 3;
 
 	printf(b);
 }

@@ -145,7 +145,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 42 "syntax.y"
+#line 83 "syntax.y"
  
 		int integer_nb;
 		float float_nb;

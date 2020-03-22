@@ -6,26 +6,67 @@
 
 	#include "symbol_table.h"
 
-	#define ABORT_ON_ERROR1(MSG, VAR1)	\
-		do {				\
-			printf("[*] ERROR: ");	\
-			printf(MSG, VAR1);	\
-			printf("\n");		\
-						\
-			exit(1);		\
+	#define ABORT_ON_ERROR1(MSG, VAR1)		\
+		do {					\
+			fprintf(stderr, "[!] ERROR: ");	\
+			fprintf(stderr, MSG, VAR1);	\
+			fprintf(stderr, "\n");		\
+							\
+			exit(1);			\
 		} while(0)
 
-	#define	push_from_addr(A)	do { printf("push [%d]\n", (A)); } while(0)
-	#define	push(A)			do { printf("push %d\n", (A)); } while(0)
+	#define WARN1(MSG, VAR1)				\
+		do {						\
+			fprintf(stderr, "[*] WARNING: ");	\
+			fprintf(stderr, MSG, VAR1);		\
+			fprintf(stderr, "\n");			\
+		} while(0)
 
-	#define pop_to_addr(A)		do { printf("pop [%d]", (A)); } while(0)
-	#define pop()			do { printf("pop\n"); } while(0)
 
-	#define call(Label)		do { printf("call %s\n", Label); } while(0)
 
-	#define cmp(A, B)		do { printf("cmp %d, %d\n", (A), (B)); } while(0)
+	FILE* out;
 
-	#define print(ADDR)		do { printf("pri %d\n", (ADDR)); } while(0)
+	void init_output(FILE *f)
+	{
+		out = f;
+	}
+
+
+	#define asm_print0(__STRING__)					do { fprintf(out, __STRING__"\n"); } while(0)
+	#define asm_print1(__STRING__, __VAR1__)			do { fprintf(out, __STRING__"\n", (__VAR1__)); } while(0)
+	#define asm_print2(__STRING__, __VAR1__, __VAR2__)		do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__)); } while(0)
+	#define asm_print3(__STRING__, __VAR1__, __VAR2__, __VAR3__)	do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__), (__VAR3__)); } while(0)
+
+	#define asm_comment(__MSG__)					do { asm_print0("; "__MSG__); } while(0)
+	#define asm_comment1(__MSG__, __VAR1__)				do { asm_print1("; "__MSG__, (__VAR1__)); } while(0)
+	#define asm_comment2(__MSG__, __VAR1__, __VAR2__)		do { asm_print1("; "__MSG__, (__VAR1__), (__VAR2__)); } while(0)
+
+	#define asm_AFC(__ADDRESS__, __VALUE__)			do { asm_print2("AFC @%d, 0x%x", (__ADDRESS__), (__VALUE__)); } while(0)
+
+	#define asm_COP(__TO__, __FROM__)			do { asm_print2("COP @%d, @%d", (__TO__), (__FROM__)); } while(0)
+
+	#define asm_ADD(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("ADD @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
+	#define asm_MUL(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("MUL @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
+	#define asm_SUB(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("SOU @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
+
+	static inline void asm_push(int value)
+	{
+		Symbol *s = symbol_table_add_tmp_symbol();
+
+		asm_AFC(s->address, value);
+	}
+
+	static inline void asm_push_from_address(int address)
+	{
+		Symbol *s = symbol_table_add_tmp_symbol();
+
+		asm_COP(s->address, address);
+	}
+
+	static inline Symbol *asm_pop()
+	{
+		return symbol_table_pop();
+	}
 
 	int yydebug = 1; 
 
@@ -113,7 +154,6 @@
 %%
 
 S : tVOID tMAIN tOP tCP BODY 
-        { printf("[MAIN]\n"); }
     ;
 
 BODY : tOCB STATEMENT tCCB ;
@@ -122,67 +162,66 @@ STATEMENT :	/* NOTHING */
 		| tSEMI_C 
 		| BODY STATEMENT
             	| DECLARATION tSEMI_C STATEMENT
-			{ printf("[DECLARATION]\n"); }
 
 		| EXPRESSION tSEMI_C STATEMENT
-			{ printf("[EXPRESSION tSEMI_C]\n"); }
 
 		| IF
+		| ASSIGNMENT tSEMI_C STATEMENT
 
 		| tRETURN EXPRESSION tSEMI_C STATEMENT
-			{ printf("[RETURN]\n"); }
            	;
            
 
            
 EXPRESSION :	EXPRESSION tADD EXPRESSION
 			{ 
-				printf("add [esp+0x4], [esp]\n");
-				pop();
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_ADD(op1->address, op1->address, op2->address);
+
+				asm_comment("Addition");
 			}
 
 		| EXPRESSION tSUB EXPRESSION
 			{ 
-				printf("sub [esp+0x4], [esp]\n");
-				pop();
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_SUB(op1->address, op1->address, op2->address);
 			}
                 
 		| EXPRESSION tMUL EXPRESSION
 			{ 
-				printf("mul [esp+0x4], [esp]\n");
-				pop();
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_MUL(op1->address, op1->address, op2->address);
 			}
 
 		| EXPRESSION tDIV EXPRESSION
 			{ 
-				printf("div [esp+0x4], [esp]\n");
-				pop();
 			}
 
 		| EXPRESSION tMOD EXPRESSION
 			{ 
-				printf("mod [esp+0x4], [esp]\n");
-				pop();
 			}
                 
                 
 		| FUNCTION_CALL
 			{
-				/*printf("[FUNCTION_CALL]\n");*/
 			}  
 
 
 		| tINTEGER_NUMBER
 			{ 
 				$$ = $1;
-				/*printf("[INTEGER_NUMBER = %d]\n", $$);*/
-				push($$);
+				asm_push($$);
 			}
 
 		| tFLOAT_NUMBER
 			{ 
 				$$ = $1;
-				printf("[FLOAT_NUMBER = %f]\n", $$);
 			}
 
 		| tIDENTIFIER
@@ -190,7 +229,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *s = symbol_table_get_symbol($1);
 
 				if (s == NULL) {
-					ABORT_ON_ERROR1("Unknown identifier '%s'", $1);
+					ABORT_ON_ERROR1("Undeclared symbol '%s'", $1);
 					/*v = add_var($1);*/
 				}
 
@@ -200,8 +239,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				/* For now we return the id only because we needed to return an integer number */
 				$$ = s->address;
 				
-				printf("[IDENTIFIER = %s]\n", s->identifier);
-				push_from_addr(s->address);
+				asm_push_from_address(s->address);
 			}
 		;
            
@@ -224,7 +262,6 @@ PRINTF :	tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY tCP
 FUNCTION_CALL :	PRINTF
 		| tIDENTIFIER tOP FUNCTION_ARGS tCP
 			{
-				call($1);
 			}
 		;
            
@@ -234,27 +271,77 @@ TYPE :	tINT
 	| tCHAR
 	;
            
-/*
-ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
-			{
-				Symbol *s = symbol_table_get_symbol($1);
-
-				printf("[ASSIGNMENT]\n");
-				pop_to_addr(s->address);
-			}
-		;
-*/
 
 DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 					{
+						if (!symbol_table_is_available($2)) {
+							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $2);
+						}
+
 						Symbol *s = symbol_table_add_symbol($2);
-						pop_to_addr(s->address);
+						symbol_table_set_initialized(s, INITIALIZED);
+
+						Symbol *expr = asm_pop();
+
+						asm_COP(s->address, expr->address);
+						asm_comment1("Declaration & assignment of '%s'", $2);
+					}
+				| tCONST TYPE tIDENTIFIER tEQUAL EXPRESSION
+					{
+						if (!symbol_table_is_available($3)) {
+							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $3);
+						}
+
+						Symbol *s = symbol_table_add_constant_symbol($3, INITIALIZED);
+
+						Symbol *expr = asm_pop();
+
+						asm_COP(s->address, expr->address);
+						asm_comment1("Declaration & assignment of constant '%s'", $3);
 					}
 				;
        
 DECLARATION :	DECLARATION_AND_ASSIGNMENT
 		| TYPE tIDENTIFIER
+			{
+				if (!symbol_table_is_available($2)) {
+					ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $2);
+				}
+
+				Symbol *s = symbol_table_add_symbol($2);
+				symbol_table_set_initialized(s, UNINITIALIZED);
+			}
+		| tCONST TYPE tIDENTIFIER
+			{
+				if (!symbol_table_is_available($3)) {
+					ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $3);
+				}
+
+				Symbol *s = symbol_table_add_constant_symbol($3, UNINITIALIZED);
+
+				WARN1("Symbol '%s' declared with 'const' class not initialized", $3);
+			}
 		;
+
+ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
+			{
+				Symbol *s = symbol_table_get_symbol($1);
+
+				if (s == NULL) {
+					ABORT_ON_ERROR1("Undeclared symbol '%s'", $1);
+
+				} else if (!symbol_table_is_constant(s)) {
+					Symbol *expr = asm_pop();
+					asm_COP(s->address, expr->address);
+
+				} else {
+					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
+				}
+
+				asm_comment1("Assignment of '%s'", $1);
+			}
+		;
+
 
 IF :	tIF tOP EXPRESSION tCP BODY
 		{
@@ -264,7 +351,9 @@ IF :	tIF tOP EXPRESSION tCP BODY
 
 int main(void)
 {
+	init_output(stdout);
 	init_symbol_table();
+
 	yylval.string = NULL;
 
 	yyparse();
