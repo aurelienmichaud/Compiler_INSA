@@ -16,6 +16,10 @@ Anvancement :
 	- Implémenter un tableau pour stocker
 	les instructions ASM			- OK
 
+	- Faire en sorte que YACC reconnaisse
+	les IF-ELSE
+	(avec accolades obligatoirement)	- OK
+
 -->	- IF-ELSE WHILE... 			- EN COURS
 
 	- Gestion des appels de fonction 	- KO
@@ -25,7 +29,7 @@ Anvancement :
 
 Implementation EN COURS :
 	
-	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE WHILE.... 
+	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE WHILE et sans accolades.... 
 
 	- Tenir compte du nombre d'instructions déjà écrites
 	(car instruction de même taille) pour récupérer
