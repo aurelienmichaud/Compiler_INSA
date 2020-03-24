@@ -33,6 +33,9 @@ typedef enum _instruction_opcode {
 } instruction_opcode;
 
 
+#define JMP_NOT_FINISHED	0
+#define JMP_FINISHED		0
+
 typedef struct {
 
 	instruction_opcode opcode;	
@@ -50,7 +53,9 @@ int asm_instruction_table_index = 0;
 
 static inline ASM_instruction *get_next_instruction_slot()
 {
-	return &(asm_instruction_table[asm_instruction_table_index++]);
+	if (asm_instruction_table_index < ASM_INSTRUCTION_TABLE_SIZE)
+		return &(asm_instruction_table[asm_instruction_table_index++]);
+	return NULL;
 }
 
 void display_asm_instruction_table(void)
@@ -171,6 +176,28 @@ void asm_COP(int to_addr, int from_addr)
 	i->opcode	 	= COP;
 	i->op1			= to_addr;
 	i->op2			= from_addr;
+}
+
+void asm_prepare_JMF(int condition_addr)
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= JMF;
+	i->op1			= condition_addr;
+	/*i->op2		= unknown for now;*/
+	i->op3			= JMP_NOT_FINISHED;
+}
+
+void asm_JMF(int condition_addr, int jmp_to_addr)
+{
+	//asm_print2("COP @%d, @%d", to_addr, from_addr);
+
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= JMF;
+	i->op1			= condition_addr;
+	i->op2			= jmp_to_addr;
+	i->op3			= JMP_FINISHED;
 }
 
 void init_output(FILE *f)

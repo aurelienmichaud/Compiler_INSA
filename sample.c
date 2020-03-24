@@ -14,5 +14,13 @@ void main() {
 
 	b = 3;
 
+	if (a + 3) {
+
+		printf(a);
+	} else
+		if(a - 2) {
+		} else {
+		}
+
 	printf(b);
 }

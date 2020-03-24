@@ -13,6 +13,9 @@ Anvancement :
 	les operations arithmetiques avec une
 	nouvelle table des symboles 		- OK
 
+	- Implémenter un tableau pour stocker
+	les instructions ASM			- OK
+
 -->	- IF-ELSE WHILE... 			- EN COURS
 
 	- Gestion des appels de fonction 	- KO
@@ -22,7 +25,7 @@ Anvancement :
 
 Implementation EN COURS :
 	
-	- Implémenter un tableau pour stocker les instructions ASM
+	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE WHILE.... 
 
 	- Tenir compte du nombre d'instructions déjà écrites
 	(car instruction de même taille) pour récupérer

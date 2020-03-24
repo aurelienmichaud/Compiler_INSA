@@ -19,6 +19,14 @@ lex.yy.o: lex_source.l
 	lex lex_source.l
 	gcc -c lex.yy.c
 
+printf:  printf_y_tab lex.yy.o
+	gcc -Wall y.tab.o lex.yy.o
+
+printf_y_tab:
+	yacc --debug --verbose -d syntax_printf.y
+	#yacc -d syntax_printf.y
+	gcc -c y.tab.c
+
 .PHONY: clean
 
 clean:
