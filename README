@@ -1,0 +1,34 @@
+
+Burlon--Roux Laura - Michaud Aurélien
+
+Anvancement : 
+
+	- Analyse lexicale et communication des
+	tokens et leur valeur vers yacc		- OK
+
+	- Table des symboles pour declaration
+	des variables 				- OK
+
+	- Gestion des variables temporaires pour
+	les operations arithmetiques avec une
+	nouvelle table des symboles 		- OK
+
+-->	- IF-ELSE WHILE... 			- EN COURS
+
+	- Gestion des appels de fonction 	- KO
+	- Gestion des pointeurs			- KO
+
+
+
+Implementation EN COURS :
+	
+	- Implémenter un tableau pour stocker les instructions ASM
+
+	- Tenir compte du nombre d'instructions déjà écrites
+	(car instruction de même taille) pour récupérer
+	l'adresse des instructions vers lesquelles nous devons jumper.
+
+	- Implémenter des fonctions pour pouvoir modifier des
+	instructions précédentes (pour le cas des adresses dans les jump JMF)
+
+

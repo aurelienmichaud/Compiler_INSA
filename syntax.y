@@ -136,7 +136,6 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 				asm_ADD(op1->address, op1->address, op2->address);
 
-				asm_comment("Addition");
 			}
 
 		| EXPRESSION tSUB EXPRESSION
@@ -240,7 +239,6 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 						Symbol *expr = asm_pop();
 
 						asm_COP(s->address, expr->address);
-						asm_comment("Declaration & assignment");
 					}
 				| tCONST TYPE tIDENTIFIER tEQUAL EXPRESSION
 					{
@@ -253,7 +251,6 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 						Symbol *expr = asm_pop();
 
 						asm_COP(s->address, expr->address);
-						asm_comment("Declaration & assignment of constant");
 					}
 				;
        
@@ -294,7 +291,6 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
 				}
 
-				asm_comment("Assignment");
 			}
 		;
 
@@ -313,5 +309,7 @@ int main(void)
 	yylval.string = NULL;
 
 	yyparse();
+
+	display_asm_instruction_table();
 }
 
