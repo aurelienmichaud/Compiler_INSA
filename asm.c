@@ -2,32 +2,23 @@
 
 #include "asm.h"
 
-/*
-#define asm_print(__STRING__)					do { fprintf(out, (__STRING__)); } while(0)
-#define asm_printl0(__STRING__)					do { fprintf(out, __STRING__"\n"); } while(0)
-#define asm_printl1(__STRING__, __VAR1__)			do { fprintf(out, __STRING__"\n", (__VAR1__)); } while(0)
-#define asm_printl2(__STRING__, __VAR1__, __VAR2__)		do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__)); } while(0)
-#define asm_printl3(__STRING__, __VAR1__, __VAR2__, __VAR3__)	do { fprintf(out, __STRING__"\n", (__VAR1__), (__VAR2__), (__VAR3__)); } while(0)
-*/
-
-/*
-#define asm_AFC(__ADDRESS__, __VALUE__)			do { asm_print2("AFC @%d, 0x%x", (__ADDRESS__), (__VALUE__)); } while(0)
-
-#define asm_COP(__TO__, __FROM__)			do { asm_print2("COP @%d, @%d", (__TO__), (__FROM__)); } while(0)
-
-#define asm_ADD(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("ADD @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-#define asm_MUL(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("MUL @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-#define asm_SUB(__RESULT__, __ADDRESS1__, __ADDRESS2__)	do { asm_print3("SOU @%d, @%d, @%d", (__RESULT__), (__ADDRESS1__), (__ADDRESS2__)); } while(0)
-*/
 
 typedef enum _instruction_opcode {
 	ADD,
-	SUB,
 	MUL,
+	SOU,
+	DIV,
 
-	AFC,
 	COP,
+	AFC,
+	JMP,
 	JMF,
+
+	INF,
+	SUP,
+	EQU,
+
+	PRI,
 	
 	NB_OF_INSTRUCTIONS
 } instruction_opcode;
@@ -69,8 +60,8 @@ void display_asm_instruction_table(void)
 			case ADD:
 				fprintf(out, "ADD %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
 				break;
-			case SUB:
-				fprintf(out, "SUB %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
+			case SOU:
+				fprintf(out, "SOU %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
 				break;
 			case MUL:
 				fprintf(out, "MUL %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
@@ -136,7 +127,7 @@ void asm_SUB(int res_addr, int op1_addr, int op2_addr)
 
 	ASM_instruction *i = get_next_instruction_slot();
 
-	i->opcode	 	= SUB;
+	i->opcode	 	= SOU;
 	i->op1			= res_addr;
 	i->op2			= op1_addr;
 	i->op3			= op2_addr;
@@ -198,6 +189,36 @@ void asm_JMF(int condition_addr, int jmp_to_addr)
 	i->op1			= condition_addr;
 	i->op2			= jmp_to_addr;
 	i->op3			= JMP_FINISHED;
+}
+
+void asm_INF(int res_addr, int op1_addr, int op2_addr)
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= INF;
+	i->op1			= res_addr;
+	i->op2			= op1_addr;
+	i->op3			= op2_addr;
+}
+
+void asm_SUP(int res_addr, int op1_addr, int op2_addr)
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= SUP;
+	i->op1			= res_addr;
+	i->op2			= op1_addr;
+	i->op3			= op2_addr;
+}
+
+void asm_EQU(int res_addr, int op1_addr, int op2_addr)
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= EQU;
+	i->op1			= res_addr;
+	i->op2			= op1_addr;
+	i->op3			= op2_addr;
 }
 
 void init_output(FILE *f)

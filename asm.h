@@ -17,6 +17,12 @@ void asm_MUL(int res_addr, int op1_addr, int op2_addr);
 void asm_AFC(int to_addr, int value);
 void asm_COP(int to_addr, int from_addr);
 
+void asm_JMF(int condition_addr, int jmp_to_addr);
+
+void asm_INF(int res_addr, int op1_addr, int op2_addr);
+void asm_SUP(int res_addr, int op1_addr, int op2_addr);
+void asm_EQU(int res_addr, int op1_addr, int op2_addr);
+
 void asm_push(int value);
 
 void asm_push_from_address(int address);

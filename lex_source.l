@@ -40,7 +40,14 @@ BLANKS	(({SPACE})|({NEWLINE}))+
 ":"		{ return tCOLON; }    
 "?"		{ return tI_MARK; }
 "!"		{ return tE_MARK; }     
-              
+
+"<="		{ return tLESS_THAN_OR_EQUAL_TO; }
+"<"		{ return tLESS_THAN; }
+">="		{ return tGREATER_THAN_OR_EQUAL_TO; }
+">"		{ return tGREATER_THAN; }
+"!="		{ return tDIFFERENT; }
+"=="		{ return tEQUAL_COMPARISON; }
+
 int		{ return tINT; }
 float		{ return tFLOAT; }
 char		{ return tCHAR; }

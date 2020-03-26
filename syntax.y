@@ -101,7 +101,15 @@
 			tSUB
 			tMOD
 
+			tLESS_THAN
+			tLESS_THAN_OR_EQUAL_TO
+			tGREATER_THAN
+			tGREATER_THAN_OR_EQUAL_TO
+			tEQUAL_COMPARISON
+			tDIFFERENT
 
+
+%left tLESS_THAN tLESS_THAN_OR_EQUAL_TO tGREATER_THAN tGREATER_THAN_OR_EQUAL_TO tDIFFERENT tEQUAL_COMPARISON
 %left tADD tSUB
 %left tMUL tDIV tMOD
 
@@ -162,6 +170,53 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 		| EXPRESSION tMOD EXPRESSION
 			{ 
+			}
+
+		| EXPRESSION tLESS_THAN EXPRESSION
+			{
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_INF(op1->address, op1->address, op2->address);
+			}
+
+		| EXPRESSION tLESS_THAN_OR_EQUAL_TO EXPRESSION
+			{
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				/* FIXME : less_than_or_equal_to is not a mild asm_INF */
+				asm_INF(op1->address, op1->address, op2->address);
+			}
+
+		| EXPRESSION tGREATER_THAN EXPRESSION
+			{
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_SUP(op1->address, op1->address, op2->address);
+			}
+
+		| EXPRESSION tGREATER_THAN_OR_EQUAL_TO EXPRESSION
+			{
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				/* FIXME : greater_than_or_equal_to is not a mild asm_SUP */
+				asm_SUP(op1->address, op1->address, op2->address);
+			}
+
+		| EXPRESSION tDIFFERENT EXPRESSION
+			{
+				/* FIXME */
+			}
+
+		| EXPRESSION tEQUAL_COMPARISON EXPRESSION
+			{
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_EQU(op1->address, op1->address, op2->address);
 			}
                 
                 
