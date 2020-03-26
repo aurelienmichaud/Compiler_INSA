@@ -23,6 +23,10 @@ void asm_INF(int res_addr, int op1_addr, int op2_addr);
 void asm_SUP(int res_addr, int op1_addr, int op2_addr);
 void asm_EQU(int res_addr, int op1_addr, int op2_addr);
 
+/* Extra functions to simulate a stackpile for temporary variables
+ * during arithmetic operations.
+ * Behind the scene are just calls to the symbol_table library 
+ * to create and delete temporary variables */
 void asm_push(int value);
 
 void asm_push_from_address(int address);
