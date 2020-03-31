@@ -33,6 +33,8 @@
 		exit(1);
 		return 1;
 	}
+
+	int last_jmp_index;
 %}
 
 
@@ -63,7 +65,7 @@
 	<integer_nb> 	tINTEGER_NUMBER 
 	<float_nb>	tFLOAT_NUMBER
 
-			tIF
+	<integer_nb>	tIF
 			tELSE
 			tWHILE
 			tSWITCH
@@ -185,8 +187,16 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op2 = asm_pop();
 				Symbol *op1 = symbol_table_peek();
 
-				/* FIXME : less_than_or_equal_to is not a mild asm_INF */
-				asm_INF(op1->address, op1->address, op2->address);
+
+				/* Less than or equal to means not superior
+				 * and since it will be followed by a JMF which check
+				 * whether the condition was false, it should work fine */
+				asm_SUP(op1->address, op1->address, op2->address);
+
+				asm_push(1);
+				op2 = asm_pop();
+
+				asm_SUB(op1->address, 1, op1->address);
 			}
 
 		| EXPRESSION tGREATER_THAN EXPRESSION
@@ -195,6 +205,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_SUP(op1->address, op1->address, op2->address);
+
 			}
 
 		| EXPRESSION tGREATER_THAN_OR_EQUAL_TO EXPRESSION
@@ -202,8 +213,12 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op2 = asm_pop();
 				Symbol *op1 = symbol_table_peek();
 
-				/* FIXME : greater_than_or_equal_to is not a mild asm_SUP */
-				asm_SUP(op1->address, op1->address, op2->address);
+				asm_INF(op1->address, op1->address, op2->address);
+
+				asm_push(1);
+				op2 = asm_pop();
+
+				asm_SUB(op1->address, 1, op1->address);
 			}
 
 		| EXPRESSION tDIFFERENT EXPRESSION
@@ -266,6 +281,8 @@ FUNCTION_ARGS_NOT_EMPTY :	EXPRESSION
            
 PRINTF :	tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY tCP
 			{
+				Symbol *addr = asm_pop();
+				asm_PRI(addr->address);
 			}
 		;
              
@@ -351,15 +368,44 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 			}
 		;
 
+/* We need to transform any non-zero expression to 1, since
+ * conditional jumps only recognize 0 (false) and 1 (true) */
+/*
+CONDITION_EXPRESION :	EXPRESSION
+				{
+					Symbol *expr = asm_pop();
+				}
+*/
 
-IF_STATEMENT :	tIF tOP EXPRESSION tCP BODY ELSE_STATEMENT
+
+IF_STATEMENT : 	tIF tOP EXPRESSION tCP 
 			{
-			}
-              
-ELSE_STATEMENT :	/* NOTHING */
-			| tELSE BODY
-			| tELSE IF_STATEMENT
+				Symbol *condition = asm_pop();
 
+				$1 = asm_prepare_JMF(condition->address);
+			}
+		BODY tELSE
+			{
+				/* asm_get_next_line() + 1 since we need to go after the following jmp */
+				asm_update_jmp($1, asm_get_next_line() + 1);
+				$1 = asm_prepare_JMP();
+			}
+		BODY
+			{
+				asm_update_jmp($1, asm_get_next_line());
+			}
+
+		
+		| tIF tOP EXPRESSION tCP
+			{
+				asm_update_jmp($1, asm_get_next_line());
+			}
+		BODY
+			{
+				asm_update_jmp($1, asm_get_next_line());
+			}
+
+		
 %%
 
 int main(void)

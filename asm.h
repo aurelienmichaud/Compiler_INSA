@@ -17,11 +17,17 @@ void asm_MUL(int res_addr, int op1_addr, int op2_addr);
 void asm_AFC(int to_addr, int value);
 void asm_COP(int to_addr, int from_addr);
 
-void asm_JMF(int condition_addr, int jmp_to_addr);
+int asm_prepare_JMP();
+int asm_JMP(int jmp_to_addr);
+
+int asm_prepare_JMF(int condition_addr);
+int asm_JMF(int condition_addr, int jmp_to_addr);
 
 void asm_INF(int res_addr, int op1_addr, int op2_addr);
 void asm_SUP(int res_addr, int op1_addr, int op2_addr);
 void asm_EQU(int res_addr, int op1_addr, int op2_addr);
+
+void asm_PRI(int addr);
 
 /* Extra functions to simulate a stackpile for temporary variables
  * during arithmetic operations.
@@ -32,5 +38,8 @@ void asm_push(int value);
 void asm_push_from_address(int address);
 
 Symbol *asm_pop();
+
+void asm_update_jmp(int jmp_instruction_index, int line_index);
+int asm_get_next_line();
 
 #endif /* _ASM_H_ */

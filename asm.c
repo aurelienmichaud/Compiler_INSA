@@ -37,6 +37,7 @@ typedef struct {
 } ASM_instruction;
 
 #define ASM_INSTRUCTION_TABLE_SIZE	1024
+#define DEBUG	1
 
 ASM_instruction asm_instruction_table[ASM_INSTRUCTION_TABLE_SIZE];
 
@@ -55,26 +56,52 @@ void display_asm_instruction_table(void)
 	for (i = 0; i < asm_instruction_table_index; i++) {
 
 		ASM_instruction *ins = &asm_instruction_table[i];
-		switch (ins->opcode) {
 
+		char str[10];
+		snprintf(str, 10, "%3d: ", i);
+
+		switch (ins->opcode) {
+			
 			case ADD:
-				fprintf(out, "ADD %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sADD %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
 				break;
 			case SOU:
-				fprintf(out, "SOU %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sSOU %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
 				break;
 			case MUL:
-				fprintf(out, "MUL %d, %d, %d\n", ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sMUL %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
 				break;
 
+
 			case AFC:
-				fprintf(out, "AFC %d, %d\n", ins->op1, ins->op2);
+				fprintf(out, "%sAFC %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
 				break;
 			case COP:
-				fprintf(out, "COP %d, %d\n", ins->op1, ins->op2);
+				fprintf(out, "%sCOP %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
 				break;
+
+
 			case JMF:
-				fprintf(out, "JMF %d, %d\n", ins->op1, ins->op2);
+				fprintf(out, "%sJMF %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
+				break;
+			case JMP:
+				fprintf(out, "%sJMP %d\n", (DEBUG ? str : ""), ins->op2);
+				break;
+
+
+			case INF:
+				fprintf(out, "%sINF %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				break;
+			case SUP:
+				fprintf(out, "%sSUP %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				break;
+			case EQU:
+				fprintf(out, "%sEQU %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				break;
+
+
+			case PRI:
+				fprintf(out, "%sPRI %d\n", (DEBUG ? str : ""), ins->op1);
 				break;
 	
 			default:
@@ -169,7 +196,33 @@ void asm_COP(int to_addr, int from_addr)
 	i->op2			= from_addr;
 }
 
-void asm_prepare_JMF(int condition_addr)
+int asm_prepare_JMP()
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= JMP;
+	/*i->op1		= condition_addr; simple jmp is condition-less*/
+	/*i->op2		= unknown for now;*/
+	i->op3			= JMP_NOT_FINISHED;
+
+	return (asm_instruction_table_index - 1);
+}
+
+int asm_JMP(int jmp_to_addr)
+{
+	//asm_print2("COP @%d, @%d", to_addr, from_addr);
+
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= JMP;
+	/*i->op1		= condition_addr; simple jmp is condition-less*/
+	i->op2			= jmp_to_addr;
+	i->op3			= JMP_FINISHED;
+
+	return (asm_instruction_table_index - 1);
+}
+
+int asm_prepare_JMF(int condition_addr)
 {
 	ASM_instruction *i = get_next_instruction_slot();
 
@@ -177,9 +230,11 @@ void asm_prepare_JMF(int condition_addr)
 	i->op1			= condition_addr;
 	/*i->op2		= unknown for now;*/
 	i->op3			= JMP_NOT_FINISHED;
+
+	return (asm_instruction_table_index - 1);
 }
 
-void asm_JMF(int condition_addr, int jmp_to_addr)
+int asm_JMF(int condition_addr, int jmp_to_addr)
 {
 	//asm_print2("COP @%d, @%d", to_addr, from_addr);
 
@@ -189,6 +244,8 @@ void asm_JMF(int condition_addr, int jmp_to_addr)
 	i->op1			= condition_addr;
 	i->op2			= jmp_to_addr;
 	i->op3			= JMP_FINISHED;
+
+	return (asm_instruction_table_index - 1);
 }
 
 void asm_INF(int res_addr, int op1_addr, int op2_addr)
@@ -219,6 +276,27 @@ void asm_EQU(int res_addr, int op1_addr, int op2_addr)
 	i->op1			= res_addr;
 	i->op2			= op1_addr;
 	i->op3			= op2_addr;
+}
+
+void asm_PRI(int addr)
+{
+	ASM_instruction *i = get_next_instruction_slot();
+
+	i->opcode	 	= PRI;
+	i->op1			= addr;
+}
+
+void asm_update_jmp(int jmp_instruction_index, int line_offset)
+{
+	ASM_instruction *i = &(asm_instruction_table[jmp_instruction_index]);
+
+	i->op2	= line_offset;
+	i->op3	= JMP_FINISHED;
+}
+
+int asm_get_next_line()
+{
+	return asm_instruction_table_index;
 }
 
 void init_output(FILE *f)
