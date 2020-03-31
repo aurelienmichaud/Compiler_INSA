@@ -21,7 +21,10 @@ Anvancement :
 	les IF-ELSE
 	(avec accolades obligatoirement)	- OK
 
--->	- IF-ELSE WHILE... 			- EN COURS
+	- Traduction IF-ELSE en assembleur
+	(avec accolades obligatoirement)	- OK
+
+-->	- WHILE... 				- EN COURS
 
 	- Gestion des appels de fonction 	- KO
 	- Gestion des pointeurs			- KO
@@ -30,13 +33,4 @@ Anvancement :
 
 Implementation EN COURS :
 	
-	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE WHILE et sans accolades.... 
-
-	- Tenir compte du nombre d'instructions déjà écrites
-	(car instruction de même taille) pour récupérer
-	l'adresse des instructions vers lesquelles nous devons jumper.
-
-	- Implémenter des fonctions pour pouvoir modifier des
-	instructions précédentes (pour le cas des adresses dans les jump JMF)
-
-
+	- Faire en sorte que YACC reconnaisse parfaitement les WHILE et sans accolades.... 
