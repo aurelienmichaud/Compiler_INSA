@@ -34,7 +34,18 @@
 		return 1;
 	}
 
-	int last_jmp_index;
+	void translate_expression_to_conditional_expression() {
+
+		asm_push(0);
+		Symbol *zero = asm_pop();
+		Symbol *expr = symbol_table_peek();
+		asm_EQU(expr->address, expr->address, zero->address);
+
+		asm_JMF(expr->address, asm_get_next_line() + 3);
+		asm_AFC(expr->address, 0);
+		asm_JMP(asm_get_next_line() + 2);
+		asm_AFC(expr->address, 1);
+	}
 %}
 
 
@@ -129,6 +140,7 @@ STATEMENT :	/* NOTHING */
 		| BODY STATEMENT
 
 		| IF_STATEMENT STATEMENT
+		| WHILE_STATEMENT STATEMENT
 
             	| DECLARATION tSEMI_C STATEMENT
 
@@ -368,18 +380,16 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 			}
 		;
 
-/* We need to transform any non-zero expression to 1, since
- * conditional jumps only recognize 0 (false) and 1 (true) */
-/*
-CONDITION_EXPRESION :	EXPRESSION
-				{
-					Symbol *expr = asm_pop();
-				}
-*/
-
 
 IF_STATEMENT : 	tIF tOP EXPRESSION tCP 
 			{
+				/* We need to transform any non-zero expression to 1, since
+				 * conditional jumps only recognize 0 (false) and 1 (true) */
+
+				/* Compare the expression with a 0 value */
+
+				translate_expression_to_conditional_expression();
+
 				Symbol *condition = asm_pop();
 
 				$1 = asm_prepare_JMF(condition->address);
@@ -398,6 +408,12 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 		
 		| tIF tOP EXPRESSION tCP
 			{
+				/* We need to transform any non-zero expression to 1, since
+				 * conditional jumps only recognize 0 (false) and 1 (true) */
+
+				/* Compare the expression with a 0 value */
+				translate_expression_to_conditional_expression();
+
 				asm_update_jmp($1, asm_get_next_line());
 			}
 		BODY
@@ -406,6 +422,32 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 			}
 
 		
+
+WHILE_STATEMENT :	tWHILE tOP
+				{
+					$2 = asm_get_next_line();
+				}
+			EXPRESSION tCP 
+				{
+					/* We need to transform any non-zero expression to 1, since
+					 * conditional jumps only recognize 0 (false) and 1 (true) */
+
+					/* Compare the expression with a 0 value */
+
+					
+					translate_expression_to_conditional_expression();
+
+					Symbol *condition = asm_pop();
+
+					$1 = asm_prepare_JMF(condition->address);
+				}
+			BODY
+				{
+					asm_update_jmp($1, asm_get_next_line() + 1);
+					asm_JMP($2);
+				}
+
+
 %%
 
 int main(void)

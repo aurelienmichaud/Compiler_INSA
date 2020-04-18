@@ -20,6 +20,12 @@ void main() {
 	} else {
 		if(a - 2) {
 		} else {
+			while (1) {
+				while(b == 3) {
+					printf(b);
+				}
+				printf(2);
+			}
 		}
 	}
 
