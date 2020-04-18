@@ -264,7 +264,15 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 		| EXPRESSION tDIFFERENT EXPRESSION
 			{
-				/* FIXME */
+				Symbol *op2 = asm_pop();
+				Symbol *op1 = symbol_table_peek();
+
+				asm_EQU(op1->address, op1->address, op2->address);
+				/* Once we have the result X of the previous EQU instruction,
+				 * We can do 1-X to get the result of the 'different' != operand */
+				asm_push(1);
+				Symbol *one = asm_pop();
+				asm_SUB(op1->address, one->address, op1->address);
 			}
 
 		| EXPRESSION tEQUAL_COMPARISON EXPRESSION
