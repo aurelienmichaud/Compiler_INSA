@@ -29,5 +29,5 @@ void main() {
 		}
 	}
 
-	printf(b);
+	printf(d);
 }

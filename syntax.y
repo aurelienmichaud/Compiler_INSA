@@ -7,20 +7,20 @@
 	#include "symbol_table.h"
 	#include "asm.h"
 
-	#define ABORT_ON_ERROR1(MSG, VAR1)		\
-		do {					\
-			fprintf(stderr, "[!] ERROR: ");	\
-			fprintf(stderr, MSG, VAR1);	\
-			fprintf(stderr, "\n");		\
-							\
-			exit(1);			\
+	#define ABORT_ON_ERROR1(MSG, VAR1)				\
+		do {							\
+			fprintf(stderr, "\x1B[01;31m[!] ERROR: ");	\
+			fprintf(stderr, MSG, (VAR1));			\
+			fprintf(stderr, "\n\x1B[0m");			\
+									\
+			exit(1);					\
 		} while(0)
 
-	#define WARN1(MSG, VAR1)				\
-		do {						\
-			fprintf(stderr, "[*] WARNING: ");	\
-			fprintf(stderr, MSG, VAR1);		\
-			fprintf(stderr, "\n");			\
+	#define WARN1(MSG, VAR1)					\
+		do {							\
+			fprintf(stderr, "\x1B[01;32m[*] WARNING: ");	\
+			fprintf(stderr, MSG, (VAR1));			\
+			fprintf(stderr, "\n\x1B[0m");			\
 		} while(0)
 
 
@@ -34,17 +34,46 @@
 		return 1;
 	}
 
+	/* Translates any expression on top of the stack into 1 or 0 for
+	 * respectively true (any expression different from 0) or false
+	 * (if that expression is 0).
+	 *
+	 * This allows the use of any expression such as '2 * 32' or 'a - 2'
+	 * to be considered as a valid conditional expression.
+	 *
+	 * Of course it does not manually check if the expression on the top
+	 * of the stack is true or false. Its goal is to produce a sequence
+	 * of assembly instruction that will do the job while running. */
 	void translate_expression_to_conditional_expression() {
 
+		asm_comment_now("translating the expression into a conditional expression");
+
+		/* We compare the expression on top of the stack with 0 */
 		asm_push(0);
 		Symbol *zero = asm_pop();
 		Symbol *expr = symbol_table_peek();
+		/* (EXPR == 0) ? */
 		asm_EQU(expr->address, expr->address, zero->address);
 
-		asm_JMF(expr->address, asm_get_next_line() + 3);
-		asm_AFC(expr->address, 0);
-		asm_JMP(asm_get_next_line() + 2);
-		asm_AFC(expr->address, 1);
+		/* Since the previous EQU instruction will set the top of the
+		 * stack to 1 if the expression was equal to 0, it means that
+		 * the expression was actually false (because equals to 0).
+		 * Therefore we now need to flip the 0 to 1 and the 1 to 0.
+		 * That flipping is done by doing 1-EQU. */
+		asm_push(1);
+		Symbol *one = asm_pop();
+		asm_SUB(expr->address, one->address, expr->address);
+		
+		/* Another workaround consists of the following instruction sequence.
+		 * Basically applying a IF-THEN-ELSE structure in order to set the 
+		 * value of the top of the stack to 0 or 1 respectively if the top of
+		 * the stack is currently 1 or 0. */
+		/*
+		 * asm_JMF(expr->address, asm_get_next_line() + 3);
+		 * asm_AFC(expr->address, 0);
+		 * asm_JMP(asm_get_next_line() + 2);
+		 * asm_AFC(expr->address, 1);
+		*/
 	}
 %}
 
@@ -102,7 +131,7 @@
 			tCB
 
 			tE_MARK
-			tI_MARK
+			tQ_MARK
 
 			tSEMI_C
 			tCOMMA
@@ -319,6 +348,8 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $2);
 						}
 
+						asm_comment_now("variable declaration and initialization");
+
 						Symbol *s = symbol_table_add_symbol($2);
 						symbol_table_set_initialized(s, INITIALIZED);
 
@@ -331,6 +362,8 @@ DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
 						if (!symbol_table_is_available($3)) {
 							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $3);
 						}
+
+						asm_comment_now("variable (constant) declaration and initialization");
 
 						Symbol *s = symbol_table_add_constant_symbol($3, INITIALIZED);
 
@@ -388,26 +421,48 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 
 				/* Compare the expression with a 0 value */
 
+				asm_comment_now("if statement");
 				translate_expression_to_conditional_expression();
 
 				Symbol *condition = asm_pop();
 
+				/* This jump allows us to skip the whole 'if' statement when the
+				 * 'if' statement was false. The address it will point to will be set
+				 * when we reach the beginning of that 'else' block, which we don't know
+				 * the address of yet. Thus we only 'prepare' this conditional jump. */
 				$1 = asm_prepare_JMF(condition->address);
 			}
 		BODY tELSE
 			{
-				/* asm_get_next_line() + 1 since we need to go after the following jmp */
+				/* If the condition of the 'if' statement was false, 
+				 * this is where the code must go in order to skip the whole
+				 * 'if' statement. So we need to provide that former conditional
+				 * jump with our current assembly instruction line number.
+				 * asm_get_next_line() + 1 since we need to go after the following jmp */
 				asm_update_jmp($1, asm_get_next_line() + 1);
+
+				/* This jump allows us to skip the whole 'else' statement when the
+				 * 'if' statement was right. The address it will point to will be set
+				 * when we reach the end of that 'else' block, which we don't know the
+				 * address of yet. Thus we only 'prepare' this unconditional jump. */
 				$1 = asm_prepare_JMP();
+				asm_comment_now("else statement");
 			}
 		BODY
 			{
+				/* If the condition of the 'if' statement was right, 
+				 * this is where the code must go in order to skip the whole
+				 * 'else' statement. So we need to provide that former conditional
+				 * jump with our current assembly instruction line number */
 				asm_update_jmp($1, asm_get_next_line());
+				asm_comment_now("end of if-else statement");
 			}
 
 		
 		| tIF tOP EXPRESSION tCP
 			{
+				asm_comment_now("if statement");
+
 				/* We need to transform any non-zero expression to 1, since
 				 * conditional jumps only recognize 0 (false) and 1 (true) */
 
@@ -419,22 +474,27 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 		BODY
 			{
 				asm_update_jmp($1, asm_get_next_line());
+				asm_comment_now("end of if statement");
 			}
 
 		
 
 WHILE_STATEMENT :	tWHILE tOP
 				{
+					/* Store the next asm instruction line number so that
+					 * the end of the 'while' block can come back here and
+					 * evaluate the conditional expression again and thus
+					 * infer whether it needs to loop again or not */
 					$2 = asm_get_next_line();
 				}
 			EXPRESSION tCP 
 				{
+					asm_comment_now("while statement");
+
 					/* We need to transform any non-zero expression to 1, since
 					 * conditional jumps only recognize 0 (false) and 1 (true) */
 
 					/* Compare the expression with a 0 value */
-
-					
 					translate_expression_to_conditional_expression();
 
 					Symbol *condition = asm_pop();
@@ -443,8 +503,16 @@ WHILE_STATEMENT :	tWHILE tOP
 				}
 			BODY
 				{
+					/* If the condition of the 'while' statement was false, 
+					 * this is where the code must go in order to skip the whole
+					 * while loop. So we just provide that conditional former jump 
+					 * with our current assembly instruction line number */
 					asm_update_jmp($1, asm_get_next_line() + 1);
+
+					/* Once we reach the end of the 'while' block, we go back
+					 * to the conditional expression in order to evaluate it again */
 					asm_JMP($2);
+					asm_comment_now("end of while statement");
 				}
 
 

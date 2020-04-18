@@ -27,6 +27,25 @@ typedef enum _instruction_opcode {
 #define JMP_NOT_FINISHED	0
 #define JMP_FINISHED		0
 
+
+#define ADDRESS_SYMBOL_STR_BOOLEAN	0
+#define ADDRESS_SYMBOL_STR		"@"
+#define LINE_NB				0
+#define COMMENTS			0
+
+#define DEBUG	
+
+#ifdef DEBUG
+# undef ADDRESS_SYMBOL_STR_BOOLEAN
+# define ADDRESS_SYMBOL_STR_BOOLEAN	1
+# undef LINE_NB
+# define LINE_NB			1
+# undef COMMENTS
+# define COMMENTS			1
+#endif
+
+#define ASM_INSTRUCTION_TABLE_SIZE	1024
+
 typedef struct {
 
 	instruction_opcode opcode;	
@@ -35,9 +54,6 @@ typedef struct {
 	int op3;
 
 } ASM_instruction;
-
-#define ASM_INSTRUCTION_TABLE_SIZE	1024
-#define DEBUG	1
 
 ASM_instruction asm_instruction_table[ASM_INSTRUCTION_TABLE_SIZE];
 
@@ -50,58 +66,93 @@ static inline ASM_instruction *get_next_instruction_slot()
 	return NULL;
 }
 
+/* Allow us to define comment for each asm
+ * instruction line, printed when DEBUG is 1 */
+#define ASM_COMMENT_TABLE_SIZE	ASM_INSTRUCTION_TABLE_SIZE
+
+typedef struct {
+	int line_nb;
+	char *comment;
+} ASM_comment;
+
+ASM_comment asm_comment_table[ASM_COMMENT_TABLE_SIZE];
+int asm_comment_table_index = 0;
+
+static inline ASM_comment *get_next_comment_slot()
+{
+	if (asm_comment_table_index < ASM_COMMENT_TABLE_SIZE)
+		return &(asm_comment_table[asm_comment_table_index++]);
+	return NULL;
+}
+
 void display_asm_instruction_table(void)
 {
 	int i;
+	int comments_index = 0;
 	for (i = 0; i < asm_instruction_table_index; i++) {
 
 		ASM_instruction *ins = &asm_instruction_table[i];
 
-		char str[10];
-		snprintf(str, 10, "%3d: ", i);
+		char line_nb[10] = "";
+		char *address_symbol = "";
+#if LINE_NB
+		snprintf(line_nb, 10, "%3d: ", i);
+#endif
+#if ADDRESS_SYMBOL_STR_BOOLEAN
+		address_symbol = ADDRESS_SYMBOL_STR;
+#endif
 
+#if COMMENTS
+		while (i == asm_comment_table[comments_index].line_nb) {
+			fprintf(out, "\x1B[01;33m; %s\n\x1B[0m", asm_comment_table[comments_index].comment);
+			if (comments_index < asm_comment_table_index)
+				comments_index++;
+			else
+				break;
+		}
+#endif
 		switch (ins->opcode) {
 			
 			case ADD:
-				fprintf(out, "%sADD %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sADD %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case SOU:
-				fprintf(out, "%sSOU %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sSOU %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case MUL:
-				fprintf(out, "%sMUL %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sMUL %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 
 
 			case AFC:
-				fprintf(out, "%sAFC %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
+				fprintf(out, "%sAFC %s%d, %d\n", line_nb, address_symbol, ins->op1, ins->op2);
 				break;
 			case COP:
-				fprintf(out, "%sCOP %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
+				fprintf(out, "%sCOP %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
 				break;
 
 
 			case JMF:
-				fprintf(out, "%sJMF %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2);
+				fprintf(out, "%sJMF %s%d, %d\n", line_nb, address_symbol, ins->op1, ins->op2);
 				break;
 			case JMP:
-				fprintf(out, "%sJMP %d\n", (DEBUG ? str : ""), ins->op2);
+				fprintf(out, "%sJMP %d\n", line_nb, ins->op2);
 				break;
 
 
 			case INF:
-				fprintf(out, "%sINF %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sINF %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case SUP:
-				fprintf(out, "%sSUP %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sSUP %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case EQU:
-				fprintf(out, "%sEQU %d, %d, %d\n", (DEBUG ? str : ""), ins->op1, ins->op2, ins->op3);
+				fprintf(out, "%sEQU %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 
 
 			case PRI:
-				fprintf(out, "%sPRI %d\n", (DEBUG ? str : ""), ins->op1);
+				fprintf(out, "%sPRI %s%d\n", line_nb, address_symbol, ins->op1);
 				break;
 	
 			default:
@@ -109,30 +160,6 @@ void display_asm_instruction_table(void)
 		}
 	}
 }
-
-
-/*
-static inline void asm_print(char *str)
-{
-	fprintf(out, str);
-}
-
-static inline void asm_print1(char *str, int var1)
-{
-	fprintf(out, str, var1);
-}
-
-static inline void asm_print2(char *str, int var1, int var2)
-{
-	fprintf(out, str, var1, var2);
-}
-
-static inline void asm_print3(char *str, int var1, int var2, int var3)
-{
-	fprintf(out, str, var1, var2, var3);
-}
-*/
-
 
 
 
@@ -321,5 +348,18 @@ void asm_push_from_address(int address)
 Symbol *asm_pop()
 {
 	return symbol_table_pop();
+}
+
+void asm_comment_now(char *comment)
+{
+	asm_comment(asm_get_next_line(), comment);
+}
+
+void asm_comment(int line_nb, char *comment)
+{
+	ASM_comment *c = get_next_comment_slot();
+
+	c->line_nb = line_nb;
+	c->comment = comment;
 }
 

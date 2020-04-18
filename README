@@ -24,7 +24,7 @@ Anvancement :
 	- Traduction IF-ELSE en assembleur
 	(avec accolades obligatoirement)	- OK
 
--->	- WHILE... 				- EN COURS
+	- WHILE... 				- OK
 
 	- Gestion des appels de fonction 	- KO
 	- Gestion des pointeurs			- KO
@@ -33,4 +33,4 @@ Anvancement :
 
 Implementation EN COURS :
 	
-	- Faire en sorte que YACC reconnaisse parfaitement les WHILE et sans accolades.... 
+	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE et WHILE sans accolades ?.... 

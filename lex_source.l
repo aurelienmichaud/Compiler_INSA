@@ -38,7 +38,7 @@ BLANKS	(({SPACE})|({NEWLINE}))+
 ";"		{ return tSEMI_C; }
 ","		{ return tCOMMA; }    
 ":"		{ return tCOLON; }    
-"?"		{ return tI_MARK; }
+"?"		{ return tQ_MARK; }
 "!"		{ return tE_MARK; }     
 
 "<="		{ return tLESS_THAN_OR_EQUAL_TO; }

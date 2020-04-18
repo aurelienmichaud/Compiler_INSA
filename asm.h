@@ -42,4 +42,7 @@ Symbol *asm_pop();
 void asm_update_jmp(int jmp_instruction_index, int line_index);
 int asm_get_next_line();
 
+void asm_comment(int line_nb, char *comment);
+void asm_comment_now(char *comment);
+
 #endif /* _ASM_H_ */
