@@ -2,8 +2,9 @@
 
 Burlon--Roux Laura - Michaud Aurélien
 
-Anvancement : 
+## Anvancement : 
 
+```
 	- Analyse lexicale et communication des
 	tokens et leur valeur vers yacc		- OK
 
@@ -28,9 +29,13 @@ Anvancement :
 
 	- Gestion des appels de fonction 	- KO
 	- Gestion des pointeurs			- KO
+```
 
 
 
-Implementation EN COURS :
+## Implementation EN COURS :
 	
+```
 	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE et WHILE sans accolades ?.... 
+```
+
