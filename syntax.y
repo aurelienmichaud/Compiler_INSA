@@ -4,6 +4,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 
+	#include "syntax_parser_data_types.h"
 	#include "symbol_table.h"
 	#include "asm.h"
 
@@ -87,6 +88,7 @@
 		char *string;
 		Symbol *symbol;
 		enum symbol_type symbol_type;
+		struct _lvalue lvalue;
 	}
 
 %token
@@ -162,9 +164,10 @@
 %left tLESS_THAN tLESS_THAN_OR_EQUAL_TO tGREATER_THAN tGREATER_THAN_OR_EQUAL_TO tDIFFERENT tEQUAL_COMPARISON
 %left tADD tSUB
 %left tMUL tDIV tMOD
+%left tOP tCP
 
-%type <symbol>	ASSIGNMENT
 %type <symbol> 	EXPRESSION
+%type <lvalue>	LVALUE
 
 %type <symbol_type> 	DECLARATION_TYPE
 %type <symbol> 		DECLARATION_AND_ASSIGNMENT
@@ -174,7 +177,11 @@
 S : tVOID tMAIN tOP tCP BODY 
     ;
 
-BODY : tOCB STATEMENT tCCB ;
+BODY : tOCB
+		{ symbol_table_increase_depth(); }
+	STATEMENT tCCB
+		{ symbol_table_decrease_depth(); }
+	;
 
 STATEMENT :	/* NOTHING */		
 		| tSEMI_C 
@@ -184,6 +191,8 @@ STATEMENT :	/* NOTHING */
 		| WHILE_STATEMENT STATEMENT
 
             	| DECLARATION tSEMI_C STATEMENT
+
+		| ASSIGNMENT tSEMI_C STATEMENT
 
 		| EXPRESSION tSEMI_C
 			/* Since EXPRESSION rule always put the result on top of the stack,
@@ -199,7 +208,11 @@ STATEMENT :	/* NOTHING */
            
 
            
-EXPRESSION :	EXPRESSION tADD EXPRESSION
+EXPRESSION :	tOP EXPRESSION tCP
+			{
+				$$ = $2;
+			}
+		| EXPRESSION tADD EXPRESSION
 			{ 
 				Symbol *op2 = asm_pop();
 				Symbol *op1 = symbol_table_peek();
@@ -336,71 +349,37 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 				if (s == NULL) {
 					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
-					/*v = add_var($1);*/
 				}
 
 
 				/* $1 is actually yylval.string */
 				free(yylval.string);
 				
-				/* COMMENT THAT PLEASE */
-				if (symbol_table_is_pointer(s)) {
-					asm_push_pointer_from_address(s->address);
-				} else {
-					asm_push_from_address(s->address);
-				}
+				asm_push_from_address(s->address);
 
 				$$ = s;
 			}
 
-		/* POINTER TYPE */
 		| tAMPERSAND tIDENTIFIER
+		/* POINTER TYPE */
 			{
 				Symbol *s = symbol_table_get_symbol($2);
 
 				if (s == NULL) {
-					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
-					/*v = add_var($1);*/
+					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $2);
 				}
 			
 				/* $2 is actually yylval.string */
 				free(yylval.string);
 				
-				asm_push_pointer_from_address(s->address);
+				asm_push_address(s->address);
 			}
+		| tMUL EXPRESSION
 		/* POINTER DEREFERENCING */
-		| tMUL tIDENTIFIER
 			{
-				Symbol *s = symbol_table_get_symbol($2);
+				Symbol *s = asm_pop();
 
-				if (s == NULL) {
-					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
-					/*v = add_var($1);*/
-				}
-			
-				if (!symbol_table_is_pointer(s)) {
-					WARN1("Use of pointer dereferencing on non-pointer type variable '%s'.", $2);
-				}
-
-				/* $2 is actually yylval.string */
-				free(yylval.string);
-				/* FIXME : How do we translate a dereferencing of pointer ? */	
-				//asm_push_pointer_from_address(s->address);
-			}
-		| ASSIGNMENT
-			/* IMPORTANT : Assignment is considered as an expression, thus it is allowed to
-			 * write 'if (a = 3)', 'a = 3' will be considered as 3, and that '3' will later be
-			 * translated into a 0-or-1-only truth value (cf. IF_STATEMENT & translate_expression_to_conditional_expression().
-			 * 'if (int a = 3)' won't be recognized though, since it is a declaration and not a 
-			 * mild assignment.
-			 * In the meantime, we can certainly say that this process will most of the time be useless, since
-			 * assignments used as value remain scarce.
-			 * It basically "push" the value of the assignment into a temporary variable which can be used later
-			 * or simply popped from the symbol table and erased by another value. */
-			{
-				asm_comment_now("assignment final value is pushed in a temporary variable");
-				asm_push_from_address(($1)->address);
-				$$ = symbol_table_peek();
+				asm_push_from_pointer_address(s->address);
 			}
 		;
            
@@ -437,16 +416,20 @@ TYPE :	tINT
 	| tCHAR
 	;
 
-DECLARATION_TYPE :	TYPE 				{ $$ = BASIC_TYPE; }
-			| tCONST TYPE			{ $$ = BASIC_CONSTANT_TYPE; }
+POINTER_STAR :	tMUL
+		| tMUL POINTER_STAR
+		;
+
+DECLARATION_TYPE :	TYPE					{ $$ = BASIC_TYPE; }
+			| tCONST TYPE				{ $$ = BASIC_CONSTANT_TYPE; }
 			/* int* */
-			| TYPE tMUL			{ $$ = POINTER_TYPE; }
+			| TYPE POINTER_STAR			{ $$ = POINTER_TYPE; }
 			/* int* const */
-			| TYPE tMUL tCONST		{ $$ = POINTER_CONSTANT_TYPE; }
+			| TYPE POINTER_STAR tCONST		{ $$ = POINTER_CONSTANT_TYPE; }
 			/* const int* */
-			| tCONST TYPE tMUL		{ $$ = POINTER_TO_CONSTANT_TYPE; }
+			| tCONST TYPE POINTER_STAR		{ $$ = POINTER_TO_CONSTANT_TYPE; }
 			/* cons int* const */
-			| tCONST TYPE tMUL tCONST	{ $$ = POINTER_CONSTANT_TO_CONSTANT_TYPE; }
+			| tCONST TYPE POINTER_STAR tCONST	{ $$ = POINTER_CONSTANT_TO_CONSTANT_TYPE; }
 			;
 
 DECLARATION_AND_ASSIGNMENT :	DECLARATION_TYPE tIDENTIFIER tEQUAL
@@ -493,7 +476,100 @@ DECLARATION :	DECLARATION_AND_ASSIGNMENT
 			}
 		;
 
-ASSIGNMENT :	tIDENTIFIER tEQUAL
+LVALUE :	tIDENTIFIER
+			{
+				struct _lvalue l = {$1, 0};
+				$$ = l;
+			}
+		| tMUL LVALUE
+			{
+				struct _lvalue l = {$2.identifier, $2.pointer_depth+1};
+				$$ = l;
+			}
+
+ASSIGNMENT :	LVALUE tEQUAL
+			{
+				int comment_size = strlen($1.identifier) + $1.pointer_depth + 80;
+				char *comment = malloc(comment_size);
+				int i;
+				int comment_current_length = 0;
+
+				snprintf(comment, comment_size, "assignment of variable '");
+				comment_current_length = strlen(comment);
+
+				for (i = 0; i < $1.pointer_depth; i++, comment_current_length = strlen(comment)) {
+					snprintf(&(comment[comment_current_length]), comment_size - comment_current_length, "*");
+				}
+
+				snprintf(&(comment[comment_current_length]), comment_size - (comment_current_length), "%s'", $1.identifier);
+
+				asm_comment_now(comment);
+			}
+		EXPRESSION
+			{
+				struct _lvalue lvalue = $1;
+				int depth;
+				Symbol *s = symbol_table_get_symbol($1.identifier);
+
+				if (s == NULL) {
+					ABORT_ON_ERROR1("Undeclared symbol '%s'", lvalue.identifier);
+				}
+
+				if (lvalue.pointer_depth == 0) {
+
+					if (!symbol_table_is_constant(s)) {
+						Symbol *expr = asm_pop();
+						asm_COP(s->address, expr->address);
+
+					} else {
+						ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", lvalue.identifier);
+					}
+				}
+				else {
+
+					if (!symbol_table_is_pointer(s)) {
+						WARN1("Dereferencing non-pointer variable '%s', prone to cause SEGFAULT.", lvalue.identifier);
+					}
+
+					for (depth = 0; depth < lvalue.pointer_depth; depth++) {
+						asm_push_from_pointer_address(s->address);
+						s = asm_pop();
+					}
+
+					Symbol *expr = asm_pop();
+					asm_STORE(s->address, expr->address);
+				}
+			}
+		/*
+		tMUL tIDENTIFIER tEQUAL
+			{
+				int comment_size = strlen($2) + 80;
+				char *comment = malloc(comment_size);
+				snprintf(comment, comment_size, "assignment of variable '*%s'", $2);
+				asm_comment_now(comment);
+			}
+		EXPRESSION
+			{
+				Symbol *s = symbol_table_get_symbol($2);
+
+
+				if (s == NULL) {
+					ABORT_ON_ERROR1("Undeclared symbol '%s'", $2);
+				}
+
+				if (!symbol_table_is_pointer(s)) {
+					WARN1("Dereferencing non-pointer variable '%s', prone to cause SEGFAULT.", $2);
+				}
+
+				if (!symbol_table_is_constant(s)) {
+					Symbol *expr = asm_pop();
+					asm_STORE(s->address, expr->address);
+
+				} else {
+					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $2);
+				}
+			}
+		| tIDENTIFIER tEQUAL
 			{
 				int comment_size = strlen($1) + 40;
 				char *comment = malloc(comment_size);
@@ -516,22 +592,24 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL
 				} else {
 					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
 				}
-
-
-				$$ = s;
 			}
+		*/
 		;
 
 
-IF_STATEMENT : 	tIF tOP EXPRESSION tCP 
+IF_STATEMENT : 	tIF 
+			{
+				asm_comment_now("if statement");
+			}
+		tOP EXPRESSION tCP 
 			{
 				/* We need to transform any non-zero expression to 1, since
 				 * conditional jumps only recognize 0 (false) and 1 (true) */
 
 				/* Compare the expression with a 0 value */
 
-				asm_comment_now("if statement");
 				translate_expression_to_conditional_expression();
+				asm_comment_now("if block {");
 
 				Symbol *condition = asm_pop();
 
@@ -564,13 +642,17 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 				 * 'else' statement. So we need to provide that former conditional
 				 * jump with our current assembly instruction line number */
 				asm_update_jmp($1, asm_get_next_line());
-				asm_comment_now("end of if-else statement");
+				asm_comment_now("} end of if-else statement");
 			}
 
 		
-		| tIF tOP EXPRESSION tCP
+		| tIF
 			{
 				asm_comment_now("if statement");
+			}
+		tOP EXPRESSION tCP
+			{
+				asm_comment_now("if block {");
 
 				/* We need to transform any non-zero expression to 1, since
 				 * conditional jumps only recognize 0 (false) and 1 (true) */
@@ -583,7 +665,7 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 		BODY
 			{
 				asm_update_jmp($1, asm_get_next_line());
-				asm_comment_now("end of if statement");
+				asm_comment_now("} end of if statement");
 			}
 		;
 
@@ -591,6 +673,8 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 
 WHILE_STATEMENT :	tWHILE tOP
 				{
+					asm_comment_now("while statement");
+
 					/* Store the next asm instruction line number so that
 					 * the end of the 'while' block can come back here and
 					 * evaluate the conditional expression again and thus
@@ -599,7 +683,6 @@ WHILE_STATEMENT :	tWHILE tOP
 				}
 			EXPRESSION tCP 
 				{
-					asm_comment_now("while statement");
 
 					/* We need to transform any non-zero expression to 1, since
 					 * conditional jumps only recognize 0 (false) and 1 (true) */
@@ -610,6 +693,7 @@ WHILE_STATEMENT :	tWHILE tOP
 					Symbol *condition = asm_pop();
 
 					$1 = asm_prepare_JMF(condition->address);
+					asm_comment_now("while block {");
 				}
 			BODY
 				{
@@ -622,7 +706,7 @@ WHILE_STATEMENT :	tWHILE tOP
 					/* Once we reach the end of the 'while' block, we go back
 					 * to the conditional expression in order to evaluate it again */
 					asm_JMP($2);
-					asm_comment_now("end of while statement");
+					asm_comment_now("} end of while statement");
 				}
 			;
 

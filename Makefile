@@ -5,7 +5,7 @@ test: comp
 comp: asm.o symbol_table.o y.tab.o lex.yy.o
 	gcc -Wall asm.o symbol_table.o y.tab.o lex.yy.o
 
-y.tab.o: syntax.y
+y.tab.o: syntax.y syntax_parser_data_types.h
 	#yacc --debug --verbose -d syntax.y
 	yacc -d syntax.y
 	gcc -c y.tab.c

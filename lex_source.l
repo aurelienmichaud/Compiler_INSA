@@ -4,6 +4,7 @@
 	#include <string.h>
 
 	#include "symbol_table.h"
+	#include "syntax_parser_data_types.h"
 	#include "y.tab.h"
 
 	extern FILE *yyin;
@@ -26,14 +27,8 @@ BLANKS	(({SPACE})|({NEWLINE}))+
 
 "("		{ return tOP; } 
 ")"		{ return tCP; }
-"{"		{
-			symbol_table_increase_depth();
-			return tOCB;
-		} 
-"}"		{
-			symbol_table_decrease_depth();
-			return tCCB;
-		}
+"{"		{ return tOCB; } 
+"}"		{ return tCCB; }
 "["		{ return tOB; } 
 "]"		{ return tCB; }
 

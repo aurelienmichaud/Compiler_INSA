@@ -29,6 +29,9 @@ void asm_EQU(int res_addr, int op1_addr, int op2_addr);
 
 void asm_PRI(int addr);
 
+void asm_STORE(int op1_addr, int op2_addr);
+void asm_LOAD(int op1_addr, int op2_addr);
+
 /* Extra functions to simulate a stackpile for temporary variables
  * during arithmetic operations.
  * Behind the scene are just calls to the symbol_table library 
@@ -36,7 +39,8 @@ void asm_PRI(int addr);
 void asm_push(int value);
 
 void asm_push_from_address(int address);
-void asm_push_pointer_from_address(int address);
+void asm_push_address(int address);
+void asm_push_from_pointer_address(int address);
 
 Symbol *asm_pop();
 
