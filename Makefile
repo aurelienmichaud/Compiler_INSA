@@ -1,3 +1,4 @@
+
 test: comp
 	./a.out < sample.c
 

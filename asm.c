@@ -33,7 +33,7 @@ typedef enum _instruction_opcode {
 #define LINE_NB				0
 #define COMMENTS			0
 
-#define DEBUG	
+#define DEBUG
 
 #ifdef DEBUG
 # undef ADDRESS_SYMBOL_STR_BOOLEAN
@@ -343,6 +343,13 @@ void asm_push_from_address(int address)
 	Symbol *s = symbol_table_add_tmp_symbol();
 
 	asm_COP(s->address, address);
+}
+
+void asm_push_pointer_from_address(int address)
+{
+	Symbol *s = symbol_table_add_tmp_symbol();
+
+	asm_AFC(s->address, address);
 }
 
 Symbol *asm_pop()

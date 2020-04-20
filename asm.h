@@ -36,6 +36,7 @@ void asm_PRI(int addr);
 void asm_push(int value);
 
 void asm_push_from_address(int address);
+void asm_push_pointer_from_address(int address);
 
 Symbol *asm_pop();
 

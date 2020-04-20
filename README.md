@@ -39,3 +39,8 @@ Burlon--Roux Laura - Michaud Aurélien
 	- Faire en sorte que YACC reconnaisse parfaitement les IF-ELSE et WHILE sans accolades ?.... 
 ```
 
+## RECOGNIZES :
+
+Declaration
+Assignment expression -> if (c = 4) is legal, (not (if (int c = 4) though)
+

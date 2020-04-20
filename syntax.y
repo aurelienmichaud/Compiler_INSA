@@ -24,6 +24,9 @@
 		} while(0)
 
 
+	/* Input stream */
+	FILE *yyin;
+
 	int yydebug = 1; 
 
 	extern int yylex();
@@ -82,6 +85,8 @@
 		int integer_nb;
 		float float_nb;
 		char *string;
+		Symbol *symbol;
+		enum symbol_type symbol_type;
 	}
 
 %token
@@ -150,12 +155,19 @@
 			tEQUAL_COMPARISON
 			tDIFFERENT
 
+			tAMPERSAND
 
+
+%left tEQUAL
 %left tLESS_THAN tLESS_THAN_OR_EQUAL_TO tGREATER_THAN tGREATER_THAN_OR_EQUAL_TO tDIFFERENT tEQUAL_COMPARISON
 %left tADD tSUB
 %left tMUL tDIV tMOD
 
-%type <integer_nb> EXPRESSION
+%type <symbol>	ASSIGNMENT
+%type <symbol> 	EXPRESSION
+
+%type <symbol_type> 	DECLARATION_TYPE
+%type <symbol> 		DECLARATION_AND_ASSIGNMENT
 
 %%
 
@@ -173,9 +185,14 @@ STATEMENT :	/* NOTHING */
 
             	| DECLARATION tSEMI_C STATEMENT
 
-		| EXPRESSION tSEMI_C STATEMENT
-
-		| ASSIGNMENT tSEMI_C STATEMENT
+		| EXPRESSION tSEMI_C
+			/* Since EXPRESSION rule always put the result on top of the stack,
+			 * once the end of the statement is reached, we need to pop that value,
+			 * in order to free the stack */
+			{
+				asm_pop();				
+			}
+		STATEMENT
 
 		| tRETURN EXPRESSION tSEMI_C STATEMENT
            	;
@@ -189,6 +206,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 				asm_ADD(op1->address, op1->address, op2->address);
 
+				$$ = op1;
 			}
 
 		| EXPRESSION tSUB EXPRESSION
@@ -197,6 +215,8 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_SUB(op1->address, op1->address, op2->address);
+
+				$$ = op1;
 			}
                 
 		| EXPRESSION tMUL EXPRESSION
@@ -205,6 +225,8 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_MUL(op1->address, op1->address, op2->address);
+
+				$$ = op1;
 			}
 
 		| EXPRESSION tDIV EXPRESSION
@@ -221,6 +243,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_INF(op1->address, op1->address, op2->address);
+				$$ = op1;
 			}
 
 		| EXPRESSION tLESS_THAN_OR_EQUAL_TO EXPRESSION
@@ -238,6 +261,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				op2 = asm_pop();
 
 				asm_SUB(op1->address, 1, op1->address);
+				$$ = op1;
 			}
 
 		| EXPRESSION tGREATER_THAN EXPRESSION
@@ -246,7 +270,7 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_SUP(op1->address, op1->address, op2->address);
-
+				$$ = op1;
 			}
 
 		| EXPRESSION tGREATER_THAN_OR_EQUAL_TO EXPRESSION
@@ -260,6 +284,8 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				op2 = asm_pop();
 
 				asm_SUB(op1->address, 1, op1->address);
+
+				$$ = op1;
 			}
 
 		| EXPRESSION tDIFFERENT EXPRESSION
@@ -273,6 +299,8 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				asm_push(1);
 				Symbol *one = asm_pop();
 				asm_SUB(op1->address, one->address, op1->address);
+
+				$$ = op1;
 			}
 
 		| EXPRESSION tEQUAL_COMPARISON EXPRESSION
@@ -281,6 +309,8 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *op1 = symbol_table_peek();
 
 				asm_EQU(op1->address, op1->address, op2->address);
+
+				$$ = op1;
 			}
                 
                 
@@ -291,13 +321,13 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 
 		| tINTEGER_NUMBER
 			{ 
-				$$ = $1;
-				asm_push($$);
+				asm_push($1);
+
+				$$ = symbol_table_peek();
 			}
 
 		| tFLOAT_NUMBER
 			{ 
-				$$ = $1;
 			}
 
 		| tIDENTIFIER
@@ -305,17 +335,72 @@ EXPRESSION :	EXPRESSION tADD EXPRESSION
 				Symbol *s = symbol_table_get_symbol($1);
 
 				if (s == NULL) {
-					ABORT_ON_ERROR1("Undeclared symbol '%s'", $1);
+					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
 					/*v = add_var($1);*/
 				}
+
 
 				/* $1 is actually yylval.string */
 				free(yylval.string);
 				
-				/* For now we return the id only because we needed to return an integer number */
-				$$ = s->address;
+				/* COMMENT THAT PLEASE */
+				if (symbol_table_is_pointer(s)) {
+					asm_push_pointer_from_address(s->address);
+				} else {
+					asm_push_from_address(s->address);
+				}
+
+				$$ = s;
+			}
+
+		/* POINTER TYPE */
+		| tAMPERSAND tIDENTIFIER
+			{
+				Symbol *s = symbol_table_get_symbol($2);
+
+				if (s == NULL) {
+					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
+					/*v = add_var($1);*/
+				}
+			
+				/* $2 is actually yylval.string */
+				free(yylval.string);
 				
-				asm_push_from_address(s->address);
+				asm_push_pointer_from_address(s->address);
+			}
+		/* POINTER DEREFERENCING */
+		| tMUL tIDENTIFIER
+			{
+				Symbol *s = symbol_table_get_symbol($2);
+
+				if (s == NULL) {
+					ABORT_ON_ERROR1("Undeclared symbol '%s'.", $1);
+					/*v = add_var($1);*/
+				}
+			
+				if (!symbol_table_is_pointer(s)) {
+					WARN1("Use of pointer dereferencing on non-pointer type variable '%s'.", $2);
+				}
+
+				/* $2 is actually yylval.string */
+				free(yylval.string);
+				/* FIXME : How do we translate a dereferencing of pointer ? */	
+				//asm_push_pointer_from_address(s->address);
+			}
+		| ASSIGNMENT
+			/* IMPORTANT : Assignment is considered as an expression, thus it is allowed to
+			 * write 'if (a = 3)', 'a = 3' will be considered as 3, and that '3' will later be
+			 * translated into a 0-or-1-only truth value (cf. IF_STATEMENT & translate_expression_to_conditional_expression().
+			 * 'if (int a = 3)' won't be recognized though, since it is a declaration and not a 
+			 * mild assignment.
+			 * In the meantime, we can certainly say that this process will most of the time be useless, since
+			 * assignments used as value remain scarce.
+			 * It basically "push" the value of the assignment into a temporary variable which can be used later
+			 * or simply popped from the symbol table and erased by another value. */
+			{
+				asm_comment_now("assignment final value is pushed in a temporary variable");
+				asm_push_from_address(($1)->address);
+				$$ = symbol_table_peek();
 			}
 		;
            
@@ -328,14 +413,17 @@ FUNCTION_ARGS_NOT_EMPTY :	EXPRESSION
 				| EXPRESSION tCOMMA FUNCTION_ARGS_NOT_EMPTY
 				;
            
-PRINTF :	tPRINTF tOP FUNCTION_ARGS_NOT_EMPTY tCP
+PRINTF :	tPRINTF tOP
+			{
+				asm_comment_now("printf");
+			}
+		FUNCTION_ARGS_NOT_EMPTY tCP
 			{
 				Symbol *addr = asm_pop();
 				asm_PRI(addr->address);
 			}
 		;
              
- 
              
 FUNCTION_CALL :	PRINTF
 		| tIDENTIFIER tOP FUNCTION_ARGS tCP
@@ -348,69 +436,80 @@ TYPE :	tINT
 	| tDOUBLE
 	| tCHAR
 	;
-           
 
-DECLARATION_AND_ASSIGNMENT :	TYPE tIDENTIFIER tEQUAL EXPRESSION
+DECLARATION_TYPE :	TYPE 				{ $$ = BASIC_TYPE; }
+			| tCONST TYPE			{ $$ = BASIC_CONSTANT_TYPE; }
+			/* int* */
+			| TYPE tMUL			{ $$ = POINTER_TYPE; }
+			/* int* const */
+			| TYPE tMUL tCONST		{ $$ = POINTER_CONSTANT_TYPE; }
+			/* const int* */
+			| tCONST TYPE tMUL		{ $$ = POINTER_TO_CONSTANT_TYPE; }
+			/* cons int* const */
+			| tCONST TYPE tMUL tCONST	{ $$ = POINTER_CONSTANT_TO_CONSTANT_TYPE; }
+			;
+
+DECLARATION_AND_ASSIGNMENT :	DECLARATION_TYPE tIDENTIFIER tEQUAL
+					{
+						int comment_size = strlen($2) + 55;
+						char *comment = malloc(comment_size);
+						snprintf(comment, comment_size, "declaration and initialization of variable '%s'", $2);
+						asm_comment_now(comment);
+					}
+				EXPRESSION
 					{
 						if (!symbol_table_is_available($2)) {
 							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $2);
 						}
 
-						asm_comment_now("variable declaration and initialization");
 
-						Symbol *s = symbol_table_add_symbol($2);
+						enum symbol_type st = $1;
+
+						Symbol *s = symbol_table_new_symbol($2, st);
 						symbol_table_set_initialized(s, INITIALIZED);
 
 						Symbol *expr = asm_pop();
 
 						asm_COP(s->address, expr->address);
-					}
-				| tCONST TYPE tIDENTIFIER tEQUAL EXPRESSION
-					{
-						if (!symbol_table_is_available($3)) {
-							ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $3);
-						}
 
-						asm_comment_now("variable (constant) declaration and initialization");
-
-						Symbol *s = symbol_table_add_constant_symbol($3, INITIALIZED);
-
-						Symbol *expr = asm_pop();
-
-						asm_COP(s->address, expr->address);
+						$$ = s;
 					}
 				;
        
 DECLARATION :	DECLARATION_AND_ASSIGNMENT
-		| TYPE tIDENTIFIER
+		| DECLARATION_TYPE tIDENTIFIER
 			{
 				if (!symbol_table_is_available($2)) {
 					ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $2);
 				}
 
-				Symbol *s = symbol_table_add_symbol($2);
-				symbol_table_set_initialized(s, UNINITIALIZED);
-			}
-		| tCONST TYPE tIDENTIFIER
-			{
-				if (!symbol_table_is_available($3)) {
-					ABORT_ON_ERROR1("Declaration of the already declared symbol '%s'", $3);
+				enum symbol_type st = $1;
+
+				Symbol *s = symbol_table_new_symbol($2, $1);
+
+				if (symbol_table_is_constant(s)) {
+					WARN1("Symbol '%s' declared with 'const' class not initialized", $2);
 				}
-
-				Symbol *s = symbol_table_add_constant_symbol($3, UNINITIALIZED);
-
-				WARN1("Symbol '%s' declared with 'const' class not initialized", $3);
 			}
 		;
 
-ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
+ASSIGNMENT :	tIDENTIFIER tEQUAL
+			{
+				int comment_size = strlen($1) + 40;
+				char *comment = malloc(comment_size);
+				snprintf(comment, comment_size, "assignment of variable '%s'", $1);
+				asm_comment_now(comment);
+			}
+		EXPRESSION
 			{
 				Symbol *s = symbol_table_get_symbol($1);
 
+
 				if (s == NULL) {
 					ABORT_ON_ERROR1("Undeclared symbol '%s'", $1);
+				}
 
-				} else if (!symbol_table_is_constant(s)) {
+				if (!symbol_table_is_constant(s)) {
 					Symbol *expr = asm_pop();
 					asm_COP(s->address, expr->address);
 
@@ -418,6 +517,8 @@ ASSIGNMENT :	tIDENTIFIER tEQUAL EXPRESSION
 					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
 				}
 
+
+				$$ = s;
 			}
 		;
 
@@ -484,6 +585,7 @@ IF_STATEMENT : 	tIF tOP EXPRESSION tCP
 				asm_update_jmp($1, asm_get_next_line());
 				asm_comment_now("end of if statement");
 			}
+		;
 
 		
 
@@ -522,13 +624,31 @@ WHILE_STATEMENT :	tWHILE tOP
 					asm_JMP($2);
 					asm_comment_now("end of while statement");
 				}
+			;
 
 
 %%
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	init_output(stdout);
+	FILE *out_file;
+	char *out_filename;
+	char *out_extension = ".asm";
+
+	if (argc > 1) {
+		size_t filename_length = strlen(argv[1]) + strlen(out_extension);
+
+		out_filename = malloc(filename_length + 1);
+		snprintf(out_filename, filename_length + 1, "%s%s", argv[1], out_extension);
+
+		out_file = fopen(out_filename, "w");
+		yyin = fopen(argv[1], "r");
+	} else {
+		out_file = stdout;
+		yyin = stdin;
+	}
+
+	init_output(out_file);
 	init_symbol_table();
 
 	yylval.string = NULL;

@@ -3,8 +3,10 @@
 	#include <stdlib.h>
 	#include <string.h>
 
-	#include "y.tab.h"
 	#include "symbol_table.h"
+	#include "y.tab.h"
+
+	extern FILE *yyin;
 %}
 
 DIGIT	[0-9]
@@ -47,6 +49,8 @@ BLANKS	(({SPACE})|({NEWLINE}))+
 ">"		{ return tGREATER_THAN; }
 "!="		{ return tDIFFERENT; }
 "=="		{ return tEQUAL_COMPARISON; }
+
+"&"		{ return tAMPERSAND; }
 
 int		{ return tINT; }
 float		{ return tFLOAT; }
@@ -113,9 +117,4 @@ printf		{ return tPRINTF; }
 %%
 
 int yywrap(void) {}
-/*
-int main(void) {
-    yylex();
-    return 1;
-}
-*/
+

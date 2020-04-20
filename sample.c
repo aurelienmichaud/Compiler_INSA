@@ -1,6 +1,7 @@
 void main() {
 	int a = 123 + 13;
 	int b = a + 12;
+	int *x = &a;
 
 	{
 		int c = 12;
@@ -9,12 +10,13 @@ void main() {
 		printf(c);
 	}
 
+	int g;
 	printf(a);
 	int d = 10;
 
 	b = 3;
 
-	if (a < 3) {
+	if (a = 3) {
 
 		printf(a);
 	} else {
