@@ -31,12 +31,10 @@ typedef enum _instruction_opcode {
 #define JMP_FINISHED		0
 
 
-#define ADDRESS_SYMBOL_STR_BOOLEAN	1
+#define ADDRESS_SYMBOL_STR_BOOLEAN	0
 #define ADDRESS_SYMBOL_STR		"@"
 #define LINE_NB				0
 #define COMMENTS			0
-
-#define DEBUG
 
 #ifdef DEBUG
 # undef ADDRESS_SYMBOL_STR_BOOLEAN
@@ -118,26 +116,26 @@ void display_asm_instruction_table(void)
 		switch (ins->opcode) {
 			
 			case ADD:
-				fprintf(out, "%sADD %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sADD %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case SOU:
-				fprintf(out, "%sSOU %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sSOU %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case MUL:
-				fprintf(out, "%sMUL %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sMUL %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 
 
 			case AFC:
-				fprintf(out, "%sAFC %s%d, %d\n", line_nb, address_symbol, ins->op1, ins->op2);
+				fprintf(out, "%sAFC %s%d %d\n", line_nb, address_symbol, ins->op1, ins->op2);
 				break;
 			case COP:
-				fprintf(out, "%sCOP %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
+				fprintf(out, "%sCOP %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
 				break;
 
 
 			case JMF:
-				fprintf(out, "%sJMF %s%d, %d\n", line_nb, address_symbol, ins->op1, ins->op2);
+				fprintf(out, "%sJMF %s%d %d\n", line_nb, address_symbol, ins->op1, ins->op2);
 				break;
 			case JMP:
 				fprintf(out, "%sJMP %d\n", line_nb, ins->op2);
@@ -145,13 +143,13 @@ void display_asm_instruction_table(void)
 
 
 			case INF:
-				fprintf(out, "%sINF %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sINF %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case SUP:
-				fprintf(out, "%sSUP %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sSUP %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 			case EQU:
-				fprintf(out, "%sEQU %s%d, %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
+				fprintf(out, "%sEQU %s%d %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2, address_symbol, ins->op3);
 				break;
 
 
@@ -160,10 +158,10 @@ void display_asm_instruction_table(void)
 				break;
 
 			case STORE:
-				fprintf(out, "%sSTORE %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
+				fprintf(out, "%sSTORE %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
 				break;
 			case LOAD:
-				fprintf(out, "%sLOAD %s%d, %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
+				fprintf(out, "%sLOAD %s%d %s%d\n", line_nb, address_symbol, ins->op1, address_symbol, ins->op2);
 				break;
 	
 			default:

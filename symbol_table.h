@@ -14,8 +14,6 @@ enum symbol_type {
 };
 
 enum init_flag		{UNINITIALIZED,	INITIALIZED};
-enum constant_flag 	{NOT_CONSTANT,	CONSTANT};
-enum pointer_flag	{NOT_POINTER,	POINTER};
 
 typedef struct _Symbol {
 

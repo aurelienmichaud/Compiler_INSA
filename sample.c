@@ -2,24 +2,18 @@ void main() {
 	{
 		int a = (2 + 1) * 3;
 		int b = a + 12;
-		int *p = &a;
-		int **x = &p;
-		int ***y = &x;
 
 		{
 			int c = 12;
 			int a = 3;
-			c = a + *x;
+			c = a + 5;
 			printf(c);
 		}
-
-		**x = 32;
-		***y = 33;
 
 		int g;
 		g = 37;
 		printf(a);
-		int d = 10 + *(*(*y));
+		int d = 10;
 
 		b = 3;
 

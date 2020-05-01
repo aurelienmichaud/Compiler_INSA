@@ -540,60 +540,6 @@ ASSIGNMENT :	LVALUE tEQUAL
 					asm_STORE(s->address, expr->address);
 				}
 			}
-		/*
-		tMUL tIDENTIFIER tEQUAL
-			{
-				int comment_size = strlen($2) + 80;
-				char *comment = malloc(comment_size);
-				snprintf(comment, comment_size, "assignment of variable '*%s'", $2);
-				asm_comment_now(comment);
-			}
-		EXPRESSION
-			{
-				Symbol *s = symbol_table_get_symbol($2);
-
-
-				if (s == NULL) {
-					ABORT_ON_ERROR1("Undeclared symbol '%s'", $2);
-				}
-
-				if (!symbol_table_is_pointer(s)) {
-					WARN1("Dereferencing non-pointer variable '%s', prone to cause SEGFAULT.", $2);
-				}
-
-				if (!symbol_table_is_constant(s)) {
-					Symbol *expr = asm_pop();
-					asm_STORE(s->address, expr->address);
-
-				} else {
-					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $2);
-				}
-			}
-		| tIDENTIFIER tEQUAL
-			{
-				int comment_size = strlen($1) + 40;
-				char *comment = malloc(comment_size);
-				snprintf(comment, comment_size, "assignment of variable '%s'", $1);
-				asm_comment_now(comment);
-			}
-		EXPRESSION
-			{
-				Symbol *s = symbol_table_get_symbol($1);
-
-
-				if (s == NULL) {
-					ABORT_ON_ERROR1("Undeclared symbol '%s'", $1);
-				}
-
-				if (!symbol_table_is_constant(s)) {
-					Symbol *expr = asm_pop();
-					asm_COP(s->address, expr->address);
-
-				} else {
-					ABORT_ON_ERROR1("Symbol '%s' declared with 'const' class is not mutable", $1);
-				}
-			}
-		*/
 		;
 
 
@@ -645,7 +591,6 @@ IF_STATEMENT : 	tIF
 				asm_comment_now("} end of if-else statement");
 			}
 
-		
 		| tIF
 			{
 				asm_comment_now("if statement");
